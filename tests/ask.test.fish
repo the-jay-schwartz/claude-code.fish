@@ -11,7 +11,7 @@ set lines (cat $CCF_STUB_LOG)
 @test "-- immediately before question" "$lines[-2]" = --
 @test "default model sonnet" (after --model) = sonnet
 @test "built-in prompt used" (after --system-prompt) = (__ccf_default_prompt ask)
-@test "fixed flags present" (string join , -- $lines[1..-3]) = (string join , -- --print --model sonnet --system-prompt (__ccf_default_prompt ask) --no-session-persistence --disable-slash-commands --tools "")
+@test "fixed flags present" (string join , -- $lines[1..-3]) = (string join , -- --print --model sonnet --system-prompt (__ccf_default_prompt ask) --no-session-persistence --disable-slash-commands --tools "" --setting-sources user --strict-mcp-config)
 ccf_teardown
 
 # question starting with a dash is passed after --
@@ -77,4 +77,34 @@ ask hi </dev/null >/dev/null
 @test "empty model falls back to sonnet" (after --model) = sonnet
 @test "empty prompt falls back to built-in" (after --system-prompt) = (__ccf_default_prompt ask)
 set -e CLAUDE_FISH_ASK_MODEL CLAUDE_FISH_ASK_SYSTEM_PROMPT
+ccf_teardown
+
+# project settings, hooks and MCP servers are ignored
+ccf_setup
+set -e CLAUDE_FISH_EXTRA_FLAGS
+ask hi </dev/null >/dev/null
+set lines (cat $CCF_STUB_LOG)
+@test "setting sources limited to user" (after --setting-sources) = user
+@test "strict mcp config before --" (contains -i -- --strict-mcp-config $lines) -lt (contains -i -- -- $lines)
+ccf_teardown
+
+# extra flags may not change tools, permissions, settings or MCP
+for flag in --tools --allowedTools --allowed-tools --dangerously-skip-permissions --permission-mode --mcp-config --settings --setting-sources --strict-mcp-config --add-dir
+    ccf_setup
+    set -g CLAUDE_FISH_EXTRA_FLAGS --max-turns 3 $flag=x
+    ask hi 2>$CCF_TMP/err </dev/null >/dev/null
+    set code $status
+    @test "refuse $flag: status 2" $code -eq 2
+    @test "refuse $flag: message" "$(cat $CCF_TMP/err)" = "ask: CLAUDE_FISH_EXTRA_FLAGS may not change tools, permissions, settings or MCP (found $flag=x)"
+    @test "refuse $flag: no call" ! -s $CCF_STUB_LOG
+    set -e CLAUDE_FISH_EXTRA_FLAGS
+    ccf_teardown
+end
+
+# harmless extra flags still reach the call
+ccf_setup
+set -g CLAUDE_FISH_EXTRA_FLAGS --max-turns 3
+ask hi </dev/null >/dev/null
+@test "harmless extra flag reaches call" (after --max-turns) = 3
+set -e CLAUDE_FISH_EXTRA_FLAGS
 ccf_teardown
