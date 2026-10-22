@@ -20,8 +20,9 @@ ccf_teardown
 ccf_setup
 set -g pre "set -g CLAUDE_FISH_SUGGEST_KEY \\cg; set -g CLAUDE_FISH_EXPLAIN_KEY \\ek;"
 set -g custom_out ($fish_bin -N -c "$pre set fish_function_path $root/functions \$fish_function_path; source $root/conf.d/claude-code.fish; bind \\cg; bind \\ek; bind -M insert \\cg; bind -M insert \\ek" 2>&1 </dev/null | string collect)
-@test "custom suggest key bound" (string match -ra '__ccf_suggest' -- $custom_out | count) -eq 2
-@test "custom explain key bound" (string match -ra '__ccf_explain' -- $custom_out | count) -eq 2
+@test "custom suggest key bound" (string match -rq 'bind ctrl-g __ccf_suggest' -- $custom_out; echo $status) = 0
+@test "custom explain key bound" (string match -rq 'bind alt-k __ccf_explain' -- $custom_out; echo $status) = 0
+@test "custom keys bound in insert mode" (string match -rq 'bind -M insert alt-k __ccf_explain' -- $custom_out; echo $status) = 0
 ccf_teardown
 
 ccf_setup
