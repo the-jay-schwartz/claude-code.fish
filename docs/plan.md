@@ -198,6 +198,7 @@ T4: done 805b694..c23704a
 T5: done fc31531..9b7814f
 T6: done 44fde0f..04c82d4
 T7: done 24bd054..6075584
+T8: done 7cdc192..00644b3
 
 ## Rulings
 
