@@ -194,6 +194,7 @@ Shared facts for every task: fish plugin laid out for Fisher (`functions/`, `con
 T1: done 9a8e975..7d50ec4
 T2: done 5111d62..8fe4fa6
 T3: done c26714e..509639f
+T4: done 805b694..c23704a
 
 ## Rulings
 
@@ -201,5 +202,6 @@ Ruling: Config names are `CLAUDE_FISH_*`, not `ZSH_CLAUDE_*`; costs a rename if 
 Ruling: License holder is "Jay Schwartz" and owner `the-jay-schwartz` (from `gh api user`); costs a one-line edit if wrong.
 Ruling: After the cold-read, I fixed the tasks myself: no-argument `ask` and `explain` print a usage line and return 2; suggest strips only wrapping fences and backticks; a failed explain widget prints no blank line; the Conventional Commits check is out of CI scope. Each is cheap to reverse.
 Ruling: I left the worktree session (`ExitWorktree keep`) so fish could run, and builders work in the worktree path by absolute path. Cost if wrong: a builder could commit in the main checkout; I check `git log` on both after each task.
+Ruling: Suggest unwraps single backticks only when the wrapped text holds no backtick, so `` `echo `date`` `` keeps its outer backticks. The task wording was ambiguous; if wrong, the user gets a stray backtick pair to delete.
 Ruling: The user approved changing two T2 assertions (argument positions) to account for `--`; the intent of both is unchanged.
 Ruling: The upstream README and CLAUDE.md copies live in the main checkout's `.workbench/sources/`, outside the worktree builders run in; costs nothing if wrong.
