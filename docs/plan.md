@@ -50,7 +50,7 @@ Upstream names are `ZSH_CLAUDE_*`. We use `CLAUDE_FISH_*` with the same suffixes
 
 Fish-specific behavior:
 
-- Unquoted `*`, `$` and `|` are parsed by fish before `ask` or `explain` sees them. The README documents quoting, as upstream does. Whether an unmatched `*` is an error in fish is untested; a test settles it.
+- Unquoted `*`, `$` and `|` are parsed by fish before `ask` or `explain` sees them. The README documents quoting, as upstream does. An unmatched `*` is a fish error that stops the command (status 124, tested on this machine), so the README must say to quote.
 - Bindings are registered for default and vi (insert and default) modes.
 - Install is via Fisher: `functions/`, `conf.d/`, `completions/`.
 
@@ -67,7 +67,7 @@ Each is answered by choosing, then testing the choice.
 
 Each task is test first, run in sequence in one worktree, and committed in Conventional Commit form.
 
-1. **Test harness.** Add `fishtape`, or `littlecheck` if fishtape is not packaged. Put a stub `claude` on `PATH` that records its arguments and stdin and prints a canned reply. Add a `mise` or `Makefile` task to run the tests.
+1. **Test harness.** `fisher`, `fishtape` and `littlecheck` are all absent on the dev machine (checked). Pick one and install it, or vendor it, before any test runs. Put a stub `claude` on `PATH` that records its arguments and stdin and prints a canned reply. Add a `mise` or `Makefile` task to run the tests.
 2. **`ask`.** Cover argument joining, model default and override, system-prompt default and override, extra flags, and a missing `claude`.
 3. **`explain`.** Same coverage as `ask`, plus quoted metacharacters.
 4. **Suggest key.** Cover buffer replacement, fence stripping, an empty line, a failing `claude` leaving the buffer unchanged, and the binding in default and vi modes. Test through `commandline` in an interactive `fish -i` run, or by calling the widget function directly.
