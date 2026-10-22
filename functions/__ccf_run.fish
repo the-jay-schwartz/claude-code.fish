@@ -15,16 +15,13 @@ function __ccf_run --description 'Run a one-shot, tool-less claude call: __ccf_r
     set -l prompt (__ccf_default_prompt $feature)
     test -n "$$prompt_var"; and set prompt $$prompt_var
 
-    # Extra flags must not re-enable tools or load settings/MCP (flag order gives no protection).
-    set -l forbidden --tools --allowedTools --allowed-tools --dangerously --permission-mode \
-        --mcp-config --settings --setting-sources --strict-mcp-config --add-dir
+    # Extra flags are allowlisted: a dash token must be one of these flags (or flag=value),
+    # so nothing can re-enable tools or load settings/MCP, whatever the flag order.
     for token in $CLAUDE_FISH_EXTRA_FLAGS
-        for prefix in $forbidden
-            if string match -q -- "$prefix*" $token
-                echo "$feature: CLAUDE_FISH_EXTRA_FLAGS may not change tools, permissions, settings or MCP (found $token)" >&2
-                return 2
-            end
-        end
+        string match -q -- '-*' $token; or continue
+        string match -qr -- '^(--effort|--max-budget-usd|--fallback-model)(=.*)?$' $token; and continue
+        echo "$feature: CLAUDE_FISH_EXTRA_FLAGS may not change tools, permissions, settings or MCP (found $token)" >&2
+        return 2
     end
 
     claude --print --model $model --system-prompt (string join \n -- $prompt) \
