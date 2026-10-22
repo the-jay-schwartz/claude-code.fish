@@ -199,6 +199,7 @@ T5: done fc31531..9b7814f
 T6: done 44fde0f..04c82d4
 T7: done 24bd054..6075584
 T8: done 7cdc192..00644b3
+Verify round 2: CI pins and settings removal 584867f..1e6d297; call hardening 1e6d297..83ad6b3 (116 tests; one assertion line extended with the user's yes).
 Verify round 1: refactor 9753249..53c0e5d (72 tests, names unchanged); code-review fixes 53c0e5d..c1e4627 (83 tests). Open items are listed in the report to the user.
 
 ## Rulings
