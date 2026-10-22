@@ -193,6 +193,7 @@ Shared facts for every task: fish plugin laid out for Fisher (`functions/`, `con
 
 T1: done 9a8e975..7d50ec4
 T2: done 5111d62..8fe4fa6
+T3: done c26714e..509639f
 
 ## Rulings
 
