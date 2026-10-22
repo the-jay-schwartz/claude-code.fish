@@ -189,6 +189,10 @@ Shared facts for every task: fish plugin laid out for Fisher (`functions/`, `con
 - [ ] It runs the whole suite with fishtape after installing fisher and fishtape
 - [ ] It triggers on `push` to `main` and on `pull_request`
 
+## Progress
+
+T1: done 9a8e975..7d50ec4
+
 ## Rulings
 
 Ruling: Config names are `CLAUDE_FISH_*`, not `ZSH_CLAUDE_*`; costs a rename if you want a different prefix.
