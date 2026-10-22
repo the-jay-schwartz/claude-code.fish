@@ -17,7 +17,7 @@ function __ccf_run --description 'Run a one-shot, tool-less claude call: __ccf_r
 
     claude --print --model $model --system-prompt (string join \n -- $prompt) \
         --no-session-persistence --disable-slash-commands --tools "" \
-        $CLAUDE_FISH_EXTRA_FLAGS $question
+        $CLAUDE_FISH_EXTRA_FLAGS -- $question
     set -l code $status
     if test $code -ne 0
         echo "$feature: claude failed with status $code" >&2

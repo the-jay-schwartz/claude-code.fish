@@ -19,9 +19,18 @@ set -e CLAUDE_FISH_ASK_MODEL CLAUDE_FISH_ASK_SYSTEM_PROMPT CLAUDE_FISH_EXTRA_FLA
 ask how do I list files </dev/null >/dev/null
 set lines (args)
 @test "question is last argument" "$lines[-1]" = "how do I list files"
+@test "-- immediately before question" "$lines[-2]" = --
 @test "default model sonnet" (after --model) = sonnet
 @test "built-in prompt used" (after --system-prompt) = (__ccf_default_prompt ask)
-@test "fixed flags present" (string join , -- $lines[1..-2]) = (string join , -- --print --model sonnet --system-prompt (__ccf_default_prompt ask) --no-session-persistence --disable-slash-commands --tools "")
+@test "fixed flags present" (string join , -- $lines[1..-3]) = (string join , -- --print --model sonnet --system-prompt (__ccf_default_prompt ask) --no-session-persistence --disable-slash-commands --tools "")
+ccf_teardown
+
+# question starting with a dash is passed after --
+ccf_setup
+set -e CLAUDE_FISH_EXTRA_FLAGS
+ask -h how </dev/null >/dev/null
+set lines (args)
+@test "dash question after --" (string join , -- $lines[-2..-1]) = "--,-h how"
 ccf_teardown
 
 # model override and prompt override and extra flags
@@ -32,7 +41,7 @@ set -g CLAUDE_FISH_EXTRA_FLAGS --max-turns 3
 ask hi </dev/null >/dev/null
 @test "model override" (after --model) = opus
 @test "prompt override" (after --system-prompt) = "be brief"
-@test "extra flags appended before question" (string join , -- (args)[-3..-1]) = "--max-turns,3,hi"
+@test "extra flags appended before question" (string join , -- (args)[-4..-1]) = "--max-turns,3,--,hi"
 set -e CLAUDE_FISH_ASK_MODEL CLAUDE_FISH_ASK_SYSTEM_PROMPT CLAUDE_FISH_EXTRA_FLAGS
 ccf_teardown
 
