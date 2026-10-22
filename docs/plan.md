@@ -20,8 +20,21 @@ Taken from the upstream README. Where the README is silent, the item is an open 
 
 **Failure**
 
-- `claude` not on `PATH`: the plugin loads and does nothing, with no error at load time. A key press or command prints a short, helpful message and exits non-zero without a crash.
-- `claude` logged out or failing: a helpful message, never a crash, and the command line is left as it was.
+- `claude` not on `PATH`: the plugin loads without error. `ask` and `explain` still exist and print a short, helpful message. The keys are not bound at all.
+- `claude` logged out or failing: a helpful message, never a crash. A failed suggest restores the original command line.
+
+**Safety and scope**
+
+- Each call is one-shot: no session saved, no tools, no slash commands. The helper only prints text. Tests assert the flags we pass.
+- The suggest key is opt-in per key press. We do not override Enter or add a `#` prefix trigger.
+- Suggest strips code fences, backticks, and surrounding whitespace before it fills the line.
+
+**Non-goals**
+
+- Multi-turn chat.
+- Streaming into the line editor.
+- Non-Claude providers.
+- Extra default keys beyond the two.
 
 **Configuration** (read at load time, set before the plugin loads)
 
@@ -37,7 +50,7 @@ Upstream names are `ZSH_CLAUDE_*`. We use `CLAUDE_FISH_*` with the same suffixes
 
 Fish-specific behavior:
 
-- Unquoted `*`, `$` and `|` are parsed by fish before `ask` or `explain` sees them. An unmatched glob is a fish error. The README documents quoting, as upstream does.
+- Unquoted `*`, `$` and `|` are parsed by fish before `ask` or `explain` sees them. The README documents quoting, as upstream does. Whether an unmatched `*` is an error in fish is untested; a test settles it.
 - Bindings are registered for default and vi (insert and default) modes.
 - Install is via Fisher: `functions/`, `conf.d/`, `completions/`.
 
