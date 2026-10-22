@@ -196,6 +196,7 @@ T2: done 5111d62..8fe4fa6
 T3: done c26714e..509639f
 T4: done 805b694..c23704a
 T5: done fc31531..9b7814f
+T6: done 44fde0f..04c82d4
 
 ## Rulings
 
