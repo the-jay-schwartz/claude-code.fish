@@ -197,6 +197,7 @@ T3: done c26714e..509639f
 T4: done 805b694..c23704a
 T5: done fc31531..9b7814f
 T6: done 44fde0f..04c82d4
+T7: done 24bd054..6075584
 
 ## Rulings
 
@@ -206,5 +207,7 @@ Ruling: After the cold-read, I fixed the tasks myself: no-argument `ask` and `ex
 Ruling: I left the worktree session (`ExitWorktree keep`) so fish could run, and builders work in the worktree path by absolute path. Cost if wrong: a builder could commit in the main checkout; I check `git log` on both after each task.
 Ruling: Suggest unwraps single backticks only when the wrapped text holds no backtick, so `` `echo `date`` `` keeps its outer backticks. The task wording was ambiguous; if wrong, the user gets a stray backtick pair to delete.
 Ruling: T5 has no test for "failure message stays on stderr", because fish sends a command substitution's stderr straight to the terminal and a test cannot capture it. The code does not touch that stream. Cost if wrong: a regression there goes unseen until the manual check.
+Ruling: T7's builder returned an empty report ("placeholder"). I checked the commit myself: the diff matches `Owns`, the suite passes, and every README item in the task is present. Cost if wrong: a README claim I did not read closely.
+Ruling: T6's three key-name assertions (`ctrl-g`, `alt-k`) match fish 4.9.3. Whether fish 3.x prints a different form is untested here, so I left them alone and will read the first CI run on fish 3.7 before changing any assertion.
 Ruling: The user approved changing two T2 assertions (argument positions) to account for `--`; the intent of both is unchanged.
 Ruling: The upstream README and CLAUDE.md copies live in the main checkout's `.workbench/sources/`, outside the worktree builders run in; costs nothing if wrong.
