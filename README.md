@@ -21,7 +21,7 @@ fisher install the-jay-schwartz/claude-code.fish
 |---|---|---|
 | `ask` | `ask <question>` | Answers tersely; a command comes first in a code block. |
 | `explain` | `explain '<command>'` | One overview line, then a bullet per flag or argument. Tab completes the command. |
-| suggest key | `Ctrl+X` (`\cx`) | Replaces the command line, written as a plain-English request, with one suggested command. It is never run. |
+| suggest key | `Ctrl+X` (`\cx`) | Replaces the command line, written as a plain-English request, with one suggested command. It is never run. A reply of more than one line is not inserted. |
 | explain key | `Alt+E` (`\ee`) | Prints an explanation of the command line above the prompt. The command line is left intact. |
 
 The keys are bound in default and insert modes, and only if `claude` is on `PATH` when the plugin loads.

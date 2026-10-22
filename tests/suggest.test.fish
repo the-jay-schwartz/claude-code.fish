@@ -41,9 +41,16 @@ ccf_teardown
 ccf_setup
 set -gx CCF_STUB_REPLY 'cd /tmp
 ls'
-run_suggest 'go and list'
-@test "newline kept" "$CCF_REPLACED" = 'cd /tmp
-ls'
+ccf_reset_commandline 'go and list'
+set err (__ccf_suggest </dev/null 2>&1 >/dev/null | string collect)
+@test "multi-line reply is rejected" $CCF_REPLACE_COUNT -eq 0 -a -z "$CCF_REPLACED" -a "$CCF_BUFFER" = 'go and list' -a "$err" = 'suggest: claude returned more than one line; not inserting' -a "$CCF_FUNCS" = repaint
+ccf_teardown
+
+ccf_setup
+set -gx CCF_STUB_REPLY 'echo hi
+'
+run_suggest 'say hi'
+@test "trailing newline still lands" "$CCF_REPLACED" = 'echo hi'
 ccf_teardown
 
 ccf_setup

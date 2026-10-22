@@ -11,7 +11,9 @@ function __ccf_suggest --description 'Replace the command line (a plain-English 
         set clean (string replace -r -- '(\A|\n)[ \t]*```\s*\z' '' $clean | string collect)
         set clean (string trim -- $clean | string collect)
         set clean (string replace -r -- '\A`([^`]*)`\z' '$1' $clean | string collect)
-        if test -n "$clean"
+        if string match -q -- "*"\n"*" $clean
+            echo 'suggest: claude returned more than one line; not inserting' >&2
+        else if test -n "$clean"
             commandline -r -- $clean
         else
             echo 'suggest: claude returned no command' >&2
