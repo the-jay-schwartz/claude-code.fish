@@ -1,0 +1,92 @@
+set -g here (status dirname)
+source $here/helpers.fish
+set -g fdir (path resolve $here/../functions)
+set -p fish_function_path $fdir
+
+# Shadow the builtin: record -r text and -f functions, serve a canned buffer for -b.
+function commandline
+    switch $argv[1]
+        case -b
+            printf %s $CCF_BUFFER
+        case -r
+            set -g CCF_REPLACED $argv[-1]
+            set -g CCF_REPLACE_COUNT (math $CCF_REPLACE_COUNT + 1)
+        case -f
+            set -ga CCF_FUNCS $argv[2]
+    end
+end
+
+function run_suggest --description 'run_suggest <buffer>'
+    set -g CCF_BUFFER $argv[1]
+    set -g CCF_REPLACED
+    set -g CCF_REPLACE_COUNT 0
+    set -g CCF_FUNCS
+    __ccf_suggest </dev/null >/dev/null 2>&1
+end
+
+ccf_setup
+set -gx CCF_STUB_REPLY '```bash
+ls -la
+```'
+run_suggest 'list files'
+@test "fence with tag removed" "$CCF_REPLACED" = 'ls -la'
+@test "repaints" "$CCF_FUNCS" = repaint
+ccf_teardown
+
+ccf_setup
+set -gx CCF_STUB_REPLY '`ls -la`'
+run_suggest 'list files'
+@test "single backticks removed" "$CCF_REPLACED" = 'ls -la'
+ccf_teardown
+
+ccf_setup
+set -gx CCF_STUB_REPLY '
+
+   ls -la   
+
+'
+run_suggest 'list files'
+@test "whitespace trimmed" "$CCF_REPLACED" = 'ls -la'
+ccf_teardown
+
+ccf_setup
+set -gx CCF_STUB_REPLY 'echo `date`'
+run_suggest 'print date'
+@test "inner backticks kept" "$CCF_REPLACED" = 'echo `date`'
+ccf_teardown
+
+ccf_setup
+set -gx CCF_STUB_REPLY 'cd /tmp
+ls'
+run_suggest 'go and list'
+@test "newline kept" "$CCF_REPLACED" = 'cd /tmp
+ls'
+ccf_teardown
+
+ccf_setup
+set -gx CCF_STUB_REPLY 'ls'
+set -gx CCF_STUB_EXIT 1
+run_suggest 'list files'
+@test "failure: no replace" $CCF_REPLACE_COUNT -eq 0
+@test "failure: still repaints" "$CCF_FUNCS" = repaint
+ccf_teardown
+
+ccf_setup
+run_suggest ''
+@test "empty buffer: no call" ! -s $CCF_STUB_LOG
+@test "empty buffer: no replace" $CCF_REPLACE_COUNT -eq 0
+ccf_teardown
+
+ccf_setup
+set -gx CCF_STUB_REPLY "touch $CCF_TMP/ran"
+run_suggest 'make a file'
+@test "suggested command not executed" ! -e $CCF_TMP/ran
+ccf_teardown
+
+ccf_setup
+set -e CLAUDE_FISH_SUGGEST_MODEL
+set -gx CCF_STUB_REPLY ls
+run_suggest 'list'
+set lines (cat $CCF_STUB_LOG)
+@test "default model sonnet" $lines[(math (contains -i -- --model $lines) + 1)] = sonnet
+ccf_teardown
