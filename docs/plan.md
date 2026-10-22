@@ -95,10 +95,11 @@ Shared facts for every task: fish plugin laid out for Fisher (`functions/`, `con
 
 **Commands:** `fishtape tests/harness.test.fish` · `fishtape tests/*.test.fish` · fishtape is installed through fisher
 **Context:** Every later test needs a fake `claude` so tests are deterministic and offline. The real CLI is called as `claude --print …`.
-**Build:** An executable fish script `tests/stubs/claude`. It appends each argument on its own line to the file named by `$CCF_STUB_LOG`. It writes stdin to `$CCF_STUB_STDIN` when that is set. It prints `$CCF_STUB_REPLY` to stdout and exits with `$CCF_STUB_EXIT` (0 when unset). `tests/helpers.fish` defines `ccf_setup` and `ccf_teardown`: setup puts `tests/stubs` first on `PATH`, makes a temp dir with a log file, and sets the `CCF_STUB_*` variables; teardown removes the temp dir and unsets them.
+**Build:** An executable fish script `tests/stubs/claude` (first line `#!/usr/bin/env fish`, mode 755). It appends each argument on its own line to the file named by `$CCF_STUB_LOG`. It writes stdin to `$CCF_STUB_STDIN` when that is set. It prints `$CCF_STUB_REPLY` to stdout (nothing when unset) and exits with `$CCF_STUB_EXIT` (0 when unset). `tests/helpers.fish` defines three functions. `ccf_setup` saves `PATH` in the global `CCF_SAVED_PATH`, makes a temp dir in the global `CCF_TMP`, creates an empty `$CCF_TMP/claude.log` and sets `CCF_STUB_LOG` to it, sets `CCF_STUB_STDIN` to `$CCF_TMP/stdin`, sets `CCF_STUB_REPLY` to empty and `CCF_STUB_EXIT` to 0, and puts `tests/stubs` first on `PATH`. `ccf_no_claude` sets `PATH` to `/usr/bin /bin` only, so that `claude` is not found; if `command -q claude` still succeeds there, report BLOCKED. `ccf_teardown` restores `PATH` from `CCF_SAVED_PATH`, removes `CCF_TMP`, and erases all the globals named here.
 - [ ] After `ccf_setup`, `claude --print hi` appends `--print` then `hi` as separate lines to the log
 - [ ] `CCF_STUB_REPLY` appears on stdout and `CCF_STUB_EXIT=3` makes the exit status 3
-- [ ] `ccf_teardown` leaves `PATH` as it was and removes the temp dir
+- [ ] After `ccf_no_claude`, `command -q claude` fails
+- [ ] `ccf_teardown` leaves `PATH` as it was, removes the temp dir, and erases the globals
 
 ### T2: Core runner, default prompts, and `ask`
 **Owns:** functions/__ccf_run.fish, functions/__ccf_default_prompt.fish, functions/ask.fish, tests/ask.test.fish
@@ -111,8 +112,9 @@ Shared facts for every task: fish plugin laid out for Fisher (`functions/`, `con
 - [ ] Default model is `sonnet`; `CLAUDE_FISH_ASK_MODEL=opus` changes it
 - [ ] A set `CLAUDE_FISH_ASK_SYSTEM_PROMPT` replaces the built-in; unset uses the built-in
 - [ ] Extra flags appear in the call, and the fixed flags `--print`, `--no-session-persistence`, `--disable-slash-commands`, `--tools` with an empty value are always present
-- [ ] With `claude` absent from `PATH`: message on stderr, status 1, nothing on stdout
+- [ ] With `claude` absent (detected by `command -q claude`; tests call `ccf_no_claude`): message on stderr, status 1, nothing on stdout
 - [ ] With `CCF_STUB_EXIT=2`: message on stderr and status 2
+- [ ] `ask` with no arguments prints `usage: ask <question>` to stderr, returns 2, and makes no call
 
 ### T3: `explain`
 **Owns:** functions/explain.fish, tests/explain.test.fish
@@ -125,16 +127,18 @@ Shared facts for every task: fish plugin laid out for Fisher (`functions/`, `con
 - [ ] Multiple unquoted words are joined with single spaces
 - [ ] `CLAUDE_FISH_EXPLAIN_MODEL` and `CLAUDE_FISH_EXPLAIN_SYSTEM_PROMPT` are honored
 - [ ] A missing `claude` gives the T2 error behavior
+- [ ] `explain` with no arguments prints `usage: explain <command>` to stderr, returns 2, and makes no call
 
 ### T4: Suggest widget function
 **Owns:** functions/__ccf_suggest.fish, tests/suggest.test.fish
 **Blocked by:** T2
 
 **Commands:** `fishtape tests/suggest.test.fish` · `fishtape tests/*.test.fish` · fishtape via fisher
-**Context:** The command line holds a plain-English request. Suggest replaces the line with one shell command; nothing runs, and the user reviews and presses Enter. Suggest strips code fences, backticks and surrounding whitespace from the reply. A failed call restores the original command line. An empty line does nothing and makes no call. Model variable `CLAUDE_FISH_SUGGEST_MODEL` (default `sonnet`). Tests cannot use a real command line, so they define a shadowing function named `commandline` that records `-r` text and `-f` functions and returns a canned buffer for `-b`.
+**Context:** The command line holds a plain-English request. Suggest replaces the line with one shell command; nothing runs, and the user reviews and presses Enter. Cleaning the reply: remove a leading fence line and a trailing fence line (three backticks, with any language tag); trim leading and trailing whitespace and newlines; if the whole result is wrapped in one pair of single backticks, remove that pair. Backticks inside the command, and newlines between lines of a multi-line reply, stay. A failed call restores the original command line. An empty line does nothing and makes no call. Model variable `CLAUDE_FISH_SUGGEST_MODEL` (default `sonnet`). Tests cannot use a real command line, so they define a shadowing function named `commandline` that records `-r` text and `-f` functions and returns a canned buffer for `-b`.
 **Build:** `__ccf_suggest`: read the buffer with `commandline -b`; return if empty; call `__ccf_run suggest <buffer>`; on success clean the reply and `commandline -r <clean>`; on failure leave the buffer unchanged; finish with `commandline -f repaint`.
 - [ ] A reply wrapped in a fenced block with a `bash` tag, or in backticks, lands on the line without fences or backticks
 - [ ] Leading and trailing whitespace and newlines are removed
+- [ ] A reply of ``echo `date` `` keeps the inner backticks, and a two-line reply keeps its newline
 - [ ] `CCF_STUB_EXIT=1` leaves the buffer untouched (no `-r` call) and still repaints
 - [ ] An empty buffer makes no `claude` call
 - [ ] The widget never executes the suggested command
@@ -145,7 +149,7 @@ Shared facts for every task: fish plugin laid out for Fisher (`functions/`, `con
 
 **Commands:** `fishtape tests/explain-widget.test.fish` · `fishtape tests/*.test.fish` · fishtape via fisher
 **Context:** The command line holds a command. The explanation prints above the prompt and the command line is untouched, so the user can still edit or run it. Uses the explain model and prompt (`CLAUDE_FISH_EXPLAIN_*`). An empty line does nothing. Tests shadow `commandline` as in T4.
-**Build:** `__ccf_explain`: read the buffer with `commandline -b`; return if empty; call `__ccf_run explain <buffer>`; print a blank line then the output to stdout; finish with `commandline -f repaint`. Never call `commandline -r`. On failure print the message from `__ccf_run` and still repaint.
+**Build:** `__ccf_explain`: read the buffer with `commandline -b`; return if empty; call `__ccf_run explain <buffer>`; on success print a blank line then the output to stdout; finish with `commandline -f repaint`. Never call `commandline -r`. On failure the message from `__ccf_run` stays on stderr, no blank line is printed, and the widget still repaints.
 - [ ] The explanation text is on stdout and the buffer is never replaced
 - [ ] An empty buffer makes no `claude` call
 - [ ] A failing `claude` still repaints and does not replace the buffer
@@ -157,7 +161,7 @@ Shared facts for every task: fish plugin laid out for Fisher (`functions/`, `con
 
 **Commands:** `fishtape tests/bindings.test.fish` · `fishtape tests/*.test.fish` · fishtape via fisher
 **Context:** Keys are read at load time, so users set them before the plugin loads. `CLAUDE_FISH_SUGGEST_KEY` defaults to `\cx` (Ctrl+X); `CLAUDE_FISH_EXPLAIN_KEY` defaults to `\ee` (Alt+E). If `claude` is not on `PATH`, no keys are bound, but loading raises no error. Bindings cover the default mode and vi insert mode. `ask` and `explain` exist regardless, since they report the missing-`claude` error themselves.
-**Build:** `conf.d/claude-code.fish` binds the suggest key to `__ccf_suggest` and the explain key to `__ccf_explain`, each with `bind` and `bind -M insert`. Tests source the file in a child fish and read `bind` output.
+**Build:** `conf.d/claude-code.fish` binds the suggest key to `__ccf_suggest` and the explain key to `__ccf_explain`, each with `bind` and `bind -M insert`. Tests source the file in a child fish and read `bind` output. For the no-`claude` case they call `ccf_no_claude` (T1) before starting the child fish.
 - [ ] Default keys bind `__ccf_suggest` and `__ccf_explain`
 - [ ] Custom key variables set before sourcing change the bound keys
 - [ ] With `claude` off `PATH`: sourcing prints nothing, exits 0, and binds neither key
@@ -168,8 +172,8 @@ Shared facts for every task: fish plugin laid out for Fisher (`functions/`, `con
 **Blocked by:** T6
 
 **Commands:** `fishtape tests/completions.test.fish` · `fishtape tests/*.test.fish` · fishtape via fisher
-**Context:** The project is `claude-code.fish`, a fish plugin. The only upstream mention allowed in the README is this credit line: "Inspired by matheus-poli/zsh-claude-code". Install is `fisher install the-jay-schwartz/claude-code.fish`. Requirements: fish 3.4 or newer, and the `claude` CLI installed and logged in (`claude login` or `ANTHROPIC_API_KEY`). The README documents: the four features and their keys; the variable table (`CLAUDE_FISH_ASK_MODEL`, `_EXPLAIN_MODEL`, `_SUGGEST_MODEL` default `sonnet`; `CLAUDE_FISH_SUGGEST_KEY` `\cx`; `CLAUDE_FISH_EXPLAIN_KEY` `\ee`; `CLAUDE_FISH_{ASK,EXPLAIN,SUGGEST}_SYSTEM_PROMPT`; `CLAUDE_FISH_EXTRA_FLAGS`); set keys before the plugin loads; quote arguments that hold `* $ | ; > <` because fish parses them first and an unmatched `*` is an error; troubleshooting for missing `claude`, a rebound key (`bind | grep __ccf`), and stray fences; the manual test checklist (`ask` and `explain` with `?`, `!`, `*` and quotes; suggest with a clear and an ambiguous request; explain key leaves the command intact; logged-out `claude` gives a message, not a crash; custom keys). License is MIT, copyright line `Copyright (c) 2026 Jay Schwartz`.
-**Build:** `completions/ask.fish` offers no completions (`complete -c ask -f`). `completions/explain.fish` completes the command and its arguments by delegating to fish's subcommand completion.
+**Context:** The project is `claude-code.fish`, a fish plugin. The only upstream mention allowed in the README is this credit line: "Inspired by matheus-poli/zsh-claude-code". Install is `fisher install the-jay-schwartz/claude-code.fish`. Requirements: fish 3.4 or newer, and the `claude` CLI installed and logged in (`claude login` or `ANTHROPIC_API_KEY`). The README documents: the four features (`ask`, `explain`, the suggest key, the explain key) and their keys; the variable table (`CLAUDE_FISH_ASK_MODEL`, `_EXPLAIN_MODEL`, `_SUGGEST_MODEL` default `sonnet`; `CLAUDE_FISH_SUGGEST_KEY` `\cx`; `CLAUDE_FISH_EXPLAIN_KEY` `\ee`; `CLAUDE_FISH_{ASK,EXPLAIN,SUGGEST}_SYSTEM_PROMPT`; `CLAUDE_FISH_EXTRA_FLAGS`); set keys before the plugin loads; quote arguments that hold `* $ | ; > <` because fish parses them first and an unmatched `*` is an error; troubleshooting for missing `claude`, a rebound key (`bind | grep __ccf`), and stray fences; the manual test checklist (`ask` and `explain` with `?`, `!`, `*` and quotes; suggest with a clear and an ambiguous request; explain key leaves the command intact; logged-out `claude` gives a message, not a crash; custom keys). License is MIT, copyright line `Copyright (c) 2026 Jay Schwartz`.
+**Build:** `completions/ask.fish` offers no completions (`complete -c ask -f`). `completions/explain.fish` is `complete -c explain -x -a "(__fish_complete_subcommand)"`, so it completes the command and its arguments. The completion test runs `source completions/ask.fish` and `source completions/explain.fish` before calling `complete -C`.
 - [ ] `complete -C 'explain gi'` includes `git`
 - [ ] `complete -C 'ask '` offers no files
 - [ ] README holds every item listed in Context; LICENSE is MIT text
@@ -179,7 +183,7 @@ Shared facts for every task: fish plugin laid out for Fisher (`functions/`, `con
 **Blocked by:** T7
 
 **Commands:** `yq . .github/workflows/ci.yml` · `fishtape tests/*.test.fish` · Conventional Commits
-**Context:** CI runs on push to `main` and on every pull request, on `ubuntu-latest` and `macos-latest`. Steps: install fish (apt on Ubuntu, brew on macOS), install fisher and then `fisher install jorgebucaran/fishtape`, run `fishtape tests/*.test.fish`. No `claude` credentials are available, so tests rely on the stub only.
+**Context:** CI runs on push to `main` and on every pull request, on `ubuntu-latest` (24.04, whose apt fish is 3.7) and `macos-latest`. Steps: install fish (`sudo apt-get install -y fish` on Ubuntu, `brew install fish` on macOS); then, in steps with `shell: fish {0}`, install fisher with `curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher`, then `fisher install jorgebucaran/fishtape`, then run `fishtape tests/*.test.fish`. A Conventional Commits check is out of scope for this task. No `claude` credentials are available, so tests rely on the stub only.
 **Build:** The workflow file.
 - [ ] `yq` parses the file and shows a `strategy.matrix.os` with both runners
 - [ ] It runs the whole suite with fishtape after installing fisher and fishtape
@@ -189,4 +193,5 @@ Shared facts for every task: fish plugin laid out for Fisher (`functions/`, `con
 
 Ruling: Config names are `CLAUDE_FISH_*`, not `ZSH_CLAUDE_*`; costs a rename if you want a different prefix.
 Ruling: License holder is "Jay Schwartz" and owner `the-jay-schwartz` (from `gh api user`); costs a one-line edit if wrong.
+Ruling: After the cold-read, I fixed the tasks myself: no-argument `ask` and `explain` print a usage line and return 2; suggest strips only wrapping fences and backticks; a failed explain widget prints no blank line; the Conventional Commits check is out of CI scope. Each is cheap to reverse.
 Ruling: The upstream README and CLAUDE.md copies live in the main checkout's `.workbench/sources/`, outside the worktree builders run in; costs nothing if wrong.
