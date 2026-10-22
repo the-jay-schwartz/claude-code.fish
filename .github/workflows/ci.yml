@@ -16,7 +16,7 @@ jobs:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Install fish (Ubuntu)
         if: runner.os == 'Linux'
@@ -29,7 +29,7 @@ jobs:
       - name: Install fisher and fishtape
         shell: fish {0}
         run: |
-          curl -sL "https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish" | source && fisher install jorgebucaran/fisher jorgebucaran/fishtape
+          curl -sL "https://raw.githubusercontent.com/jorgebucaran/fisher/a04308be92daa6cfecdbb0ca58b1e8508664cff2/functions/fisher.fish" | source && fisher install jorgebucaran/fisher@4.4.8 jorgebucaran/fishtape@3.0.1
 
       - name: Run tests
         shell: fish {0}
