@@ -26,14 +26,10 @@ jobs:
         if: runner.os == 'macOS'
         run: brew install fish
 
-      - name: Install fisher
+      - name: Install fisher and fishtape
         shell: fish {0}
         run: |
-          curl -sL "https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish" | source && fisher install jorgebucaran/fisher
-
-      - name: Install fishtape
-        shell: fish {0}
-        run: fisher install jorgebucaran/fishtape
+          curl -sL "https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish" | source && fisher install jorgebucaran/fisher jorgebucaran/fishtape
 
       - name: Run tests
         shell: fish {0}

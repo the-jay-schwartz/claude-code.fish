@@ -1,23 +1,12 @@
 set -g here (status dirname)
 source $here/helpers.fish
-set -g fdir (path resolve $here/../functions)
-set -p fish_function_path $fdir
-
-function args
-    cat $CCF_STUB_LOG
-end
-
-function after --description 'line following flag $argv[1] in the log'
-    set -l lines (cat $CCF_STUB_LOG)
-    set -l i (contains -i -- $argv[1] $lines)
-    echo $lines[(math $i + 1)]
-end
+ccf_load_functions
 
 # question is last argument, words joined
 ccf_setup
 set -e CLAUDE_FISH_ASK_MODEL CLAUDE_FISH_ASK_SYSTEM_PROMPT CLAUDE_FISH_EXTRA_FLAGS
 ask how do I list files </dev/null >/dev/null
-set lines (args)
+set lines (cat $CCF_STUB_LOG)
 @test "question is last argument" "$lines[-1]" = "how do I list files"
 @test "-- immediately before question" "$lines[-2]" = --
 @test "default model sonnet" (after --model) = sonnet
@@ -29,7 +18,7 @@ ccf_teardown
 ccf_setup
 set -e CLAUDE_FISH_EXTRA_FLAGS
 ask -h how </dev/null >/dev/null
-set lines (args)
+set lines (cat $CCF_STUB_LOG)
 @test "dash question after --" (string join , -- $lines[-2..-1]) = "--,-h how"
 ccf_teardown
 
@@ -41,7 +30,7 @@ set -g CLAUDE_FISH_EXTRA_FLAGS --max-turns 3
 ask hi </dev/null >/dev/null
 @test "model override" (after --model) = opus
 @test "prompt override" (after --system-prompt) = "be brief"
-@test "extra flags appended before question" (string join , -- (args)[-4..-1]) = "--max-turns,3,--,hi"
+@test "extra flags appended before question" (string join , -- (cat $CCF_STUB_LOG)[-4..-1]) = "--max-turns,3,--,hi"
 set -e CLAUDE_FISH_ASK_MODEL CLAUDE_FISH_ASK_SYSTEM_PROMPT CLAUDE_FISH_EXTRA_FLAGS
 ccf_teardown
 
@@ -59,7 +48,6 @@ set code $status
 @test "absent: status 1" $code -eq 1
 @test "absent: stdout empty" -z "$out"
 @test "absent: stderr message" -s $CCF_TMP/err
-set -gx PATH $CCF_SAVED_PATH
 ccf_teardown
 
 # claude fails

@@ -1,26 +1,9 @@
 set -g here (status dirname)
 source $here/helpers.fish
-set -g fdir (path resolve $here/../functions)
-set -p fish_function_path $fdir
-
-# Shadow the builtin: record -r text and -f functions, serve a canned buffer for -b.
-function commandline
-    switch $argv[1]
-        case -b
-            printf %s $CCF_BUFFER
-        case -r
-            set -g CCF_REPLACED $argv[-1]
-            set -g CCF_REPLACE_COUNT (math $CCF_REPLACE_COUNT + 1)
-        case -f
-            set -ga CCF_FUNCS $argv[2]
-    end
-end
+ccf_load_functions
 
 function run_suggest --description 'run_suggest <buffer>'
-    set -g CCF_BUFFER $argv[1]
-    set -g CCF_REPLACED
-    set -g CCF_REPLACE_COUNT 0
-    set -g CCF_FUNCS
+    ccf_reset_commandline $argv[1]
     __ccf_suggest </dev/null >/dev/null 2>&1
 end
 

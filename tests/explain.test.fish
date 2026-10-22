@@ -1,13 +1,6 @@
 set -g here (status dirname)
 source $here/helpers.fish
-set -g fdir (path resolve $here/../functions)
-set -p fish_function_path $fdir
-
-function after --description 'line following flag $argv[1] in the log'
-    set -l lines (cat $CCF_STUB_LOG)
-    set -l i (contains -i -- $argv[1] $lines)
-    echo $lines[(math $i + 1)]
-end
+ccf_load_functions
 
 # quoted command is sent verbatim as the last argument
 ccf_setup
@@ -44,7 +37,6 @@ set code $status
 @test "absent: status 1" $code -eq 1
 @test "absent: stdout empty" -z "$out"
 @test "absent: stderr message" -s $CCF_TMP/err
-set -gx PATH $CCF_SAVED_PATH
 ccf_teardown
 
 # no arguments
