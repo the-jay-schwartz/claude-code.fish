@@ -128,8 +128,8 @@ for flags in "--effort low" --effort=low "--max-budget-usd 1" "--fallback-model 
     set -g CLAUDE_FISH_EXTRA_FLAGS (string split ' ' -- $flags)
     ask hi </dev/null >/dev/null
     set lines (cat $CCF_STUB_LOG)
-    set n (count $CLAUDE_FISH_EXTRA_FLAGS)
-    @test "allowlist passes $flags" (string join , -- $lines[-(math $n + 2)..-3]) = (string join , -- $CLAUDE_FISH_EXTRA_FLAGS)
+    set n (math 2 + (count $CLAUDE_FISH_EXTRA_FLAGS))
+    @test "allowlist passes $flags" (string join , -- $lines[-$n..-3]) = (string join , -- $CLAUDE_FISH_EXTRA_FLAGS)
     set -e CLAUDE_FISH_EXTRA_FLAGS
     ccf_teardown
 end
