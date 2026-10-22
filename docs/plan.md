@@ -106,7 +106,7 @@ Shared facts for every task: fish plugin laid out for Fisher (`functions/`, `con
 **Blocked by:** T1
 
 **Commands:** `fishtape tests/ask.test.fish` · `fishtape tests/*.test.fish` · fishtape via fisher
-**Context:** Behavior contract. `ask <words…>` prints a terse answer; if the answer is a command it shows the command first in a fenced block, then at most one short line of context. Arguments are joined with spaces into one question. Model per feature defaults to `sonnet`; the variable is `CLAUDE_FISH_ASK_MODEL`. `CLAUDE_FISH_ASK_SYSTEM_PROMPT`, when set, fully replaces the built-in prompt. `CLAUDE_FISH_EXTRA_FLAGS` (a list) is appended to every call. Each call is one-shot with no tools: `claude --print --model <m> --system-prompt <p> --no-session-persistence --disable-slash-commands --tools "" <extra flags> <question>`. If `claude` is not on `PATH`, print a short helpful message to stderr and return 1. If `claude` fails, print a short helpful message to stderr and return its status. The same runner also serves `explain` (T3) and the suggest widget (T4), so it takes the feature name.
+**Context:** Behavior contract. `ask <words…>` prints a terse answer; if the answer is a command it shows the command first in a fenced block, then at most one short line of context. Arguments are joined with spaces into one question. Model per feature defaults to `sonnet`; the variable is `CLAUDE_FISH_ASK_MODEL`. `CLAUDE_FISH_ASK_SYSTEM_PROMPT`, when set, fully replaces the built-in prompt. `CLAUDE_FISH_EXTRA_FLAGS` (a list) is appended to every call. Each call is one-shot with no tools: `claude --print --model <m> --system-prompt <p> --no-session-persistence --disable-slash-commands --tools "" <extra flags> -- <question>`. The `--` is needed because the real CLI's `--tools` takes a variadic list and would otherwise swallow the question (found by running the real CLI; the stub cannot show it). If `claude` is not on `PATH`, print a short helpful message to stderr and return 1. If `claude` fails, print a short helpful message to stderr and return its status. The same runner also serves `explain` (T3) and the suggest widget (T4), so it takes the feature name.
 **Build:** `__ccf_run <feature> <question words…>` for feature `ask`, `explain` or `suggest`; it reads `CLAUDE_FISH_<FEATURE>_MODEL`, `CLAUDE_FISH_<FEATURE>_SYSTEM_PROMPT` and `CLAUDE_FISH_EXTRA_FLAGS`, runs the call above, and passes stdout through. `__ccf_default_prompt <feature>` prints the built-in system prompt for each of the three features, in your own words: ask is terse and fences a command first; explain gives one overview line then one short bullet per flag or argument; suggest outputs exactly one shell command and nothing else. `ask` calls `__ccf_run ask $argv`.
 - [ ] `ask how do I list files` sends the question `how do I list files` as the last argument
 - [ ] Default model is `sonnet`; `CLAUDE_FISH_ASK_MODEL=opus` changes it
@@ -192,10 +192,13 @@ Shared facts for every task: fish plugin laid out for Fisher (`functions/`, `con
 ## Progress
 
 T1: done 9a8e975..7d50ec4
+T2: done 5111d62..8fe4fa6
 
 ## Rulings
 
 Ruling: Config names are `CLAUDE_FISH_*`, not `ZSH_CLAUDE_*`; costs a rename if you want a different prefix.
 Ruling: License holder is "Jay Schwartz" and owner `the-jay-schwartz` (from `gh api user`); costs a one-line edit if wrong.
 Ruling: After the cold-read, I fixed the tasks myself: no-argument `ask` and `explain` print a usage line and return 2; suggest strips only wrapping fences and backticks; a failed explain widget prints no blank line; the Conventional Commits check is out of CI scope. Each is cheap to reverse.
+Ruling: I left the worktree session (`ExitWorktree keep`) so fish could run, and builders work in the worktree path by absolute path. Cost if wrong: a builder could commit in the main checkout; I check `git log` on both after each task.
+Ruling: The user approved changing two T2 assertions (argument positions) to account for `--`; the intent of both is unchanged.
 Ruling: The upstream README and CLAUDE.md copies live in the main checkout's `.workbench/sources/`, outside the worktree builders run in; costs nothing if wrong.
