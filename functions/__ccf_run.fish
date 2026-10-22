@@ -11,9 +11,9 @@ function __ccf_run --description 'Run a one-shot, tool-less claude call: __ccf_r
     set -l model_var CLAUDE_FISH_{$upper}_MODEL
     set -l prompt_var CLAUDE_FISH_{$upper}_SYSTEM_PROMPT
     set -l model sonnet
-    set -q $model_var; and set model $$model_var
+    test -n "$$model_var"; and set model $$model_var
     set -l prompt (__ccf_default_prompt $feature)
-    set -q $prompt_var; and set prompt $$prompt_var
+    test -n "$$prompt_var"; and set prompt $$prompt_var
 
     claude --print --model $model --system-prompt (string join \n -- $prompt) \
         --no-session-persistence --disable-slash-commands --tools "" \

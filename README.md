@@ -40,7 +40,7 @@ Set variables before the plugin loads (for example in `config.fish`); keys are r
 | `CLAUDE_FISH_ASK_SYSTEM_PROMPT` | built-in | Replaces the system prompt for `ask` |
 | `CLAUDE_FISH_EXPLAIN_SYSTEM_PROMPT` | built-in | Replaces the system prompt for `explain` |
 | `CLAUDE_FISH_SUGGEST_SYSTEM_PROMPT` | built-in | Replaces the system prompt for suggest |
-| `CLAUDE_FISH_EXTRA_FLAGS` | none | Extra flags passed to `claude` |
+| `CLAUDE_FISH_EXTRA_FLAGS` | none | Extra flags passed to `claude`; must be a fish list, e.g. `set -g CLAUDE_FISH_EXTRA_FLAGS --max-turns 3`. A single quoted string such as `'--max-turns 3'` is passed as one argument |
 
 ## Quoting
 

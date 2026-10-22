@@ -67,3 +67,14 @@ set code $status
 @test "no args: usage" (cat $CCF_TMP/err) = "usage: ask <question>"
 @test "no args: no call" ! -s $CCF_STUB_LOG
 ccf_teardown
+
+# set-but-empty overrides fall back to the defaults
+ccf_setup
+set -gx CLAUDE_FISH_ASK_MODEL ''
+set -gx CLAUDE_FISH_ASK_SYSTEM_PROMPT ''
+set -e CLAUDE_FISH_EXTRA_FLAGS
+ask hi </dev/null >/dev/null
+@test "empty model falls back to sonnet" (after --model) = sonnet
+@test "empty prompt falls back to built-in" (after --system-prompt) = (__ccf_default_prompt ask)
+set -e CLAUDE_FISH_ASK_MODEL CLAUDE_FISH_ASK_SYSTEM_PROMPT
+ccf_teardown

@@ -73,3 +73,16 @@ run_suggest 'list'
 set lines (cat $CCF_STUB_LOG)
 @test "default model sonnet" $lines[(math (contains -i -- --model $lines) + 1)] = sonnet
 ccf_teardown
+
+for reply in '' '```
+```' '  
+ '
+    ccf_setup
+    set -gx CCF_STUB_REPLY $reply
+    ccf_reset_commandline 'list files'
+    set err (__ccf_suggest </dev/null 2>&1 >/dev/null | string collect)
+    @test "empty reply: buffer untouched" $CCF_REPLACE_COUNT -eq 0
+    @test "empty reply: message on stderr" "$err" = 'suggest: claude returned no command'
+    @test "empty reply: still repaints" "$CCF_FUNCS" = repaint
+    ccf_teardown
+end

@@ -8,10 +8,14 @@ function __ccf_suggest --description 'Replace the command line (a plain-English 
         # backticks that surrounds a command containing none.
         set -l clean (string join \n -- $reply | string collect)
         set clean (string replace -r -- '\A\s*```[^\n]*\n' '' $clean | string collect)
-        set clean (string replace -r -- '\n[ \t]*```\s*\z' '' $clean | string collect)
+        set clean (string replace -r -- '(\A|\n)[ \t]*```\s*\z' '' $clean | string collect)
         set clean (string trim -- $clean | string collect)
         set clean (string replace -r -- '\A`([^`]*)`\z' '$1' $clean | string collect)
-        commandline -r -- $clean
+        if test -n "$clean"
+            commandline -r -- $clean
+        else
+            echo 'suggest: claude returned no command' >&2
+        end
     end
     commandline -f repaint
 end
