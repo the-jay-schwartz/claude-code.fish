@@ -67,7 +67,7 @@ Each is answered by choosing, then testing the choice.
 
 Each task is test first, run in sequence in one worktree, and committed in Conventional Commit form.
 
-1. **Test harness.** `fisher`, `fishtape` and `littlecheck` are all absent on the dev machine (checked). Pick one and install it, or vendor it, before any test runs. Put a stub `claude` on `PATH` that records its arguments and stdin and prints a canned reply. Add a `mise` or `Makefile` task to run the tests.
+1. **Test harness.** Use `fishtape`, installed with fisher (`fisher install jorgebucaran/fishtape`). Fisher 4.4.8 is on the dev machine and `fisher list` shows fishtape is not installed yet. Put a stub `claude` on `PATH` that records its arguments and stdin and prints a canned reply. Add a `mise` or `Makefile` task to run the tests.
 2. **`ask`.** Cover argument joining, model default and override, system-prompt default and override, extra flags, and a missing `claude`.
 3. **`explain`.** Same coverage as `ask`, plus quoted metacharacters.
 4. **Suggest key.** Cover buffer replacement, fence stripping, an empty line, a failing `claude` leaving the buffer unchanged, and the binding in default and vi modes. Test through `commandline` in an interactive `fish -i` run, or by calling the widget function directly.
