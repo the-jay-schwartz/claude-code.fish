@@ -70,6 +70,14 @@ ask 'how do I list files > 1MB?'
 - [ ] Logged out, `claude` failure gives a message, not a crash
 - [ ] Custom keys work when set before the plugin loads
 
+### Running the live smoke test
+
+```fish
+CCF_LIVE=1 fishtape tests/live.test.fish
+```
+
+Needs a logged-in `claude` on your `PATH` and makes a few small API calls. Without `CCF_LIVE=1` it only shows a placeholder test.
+
 ## License
 
 MIT
