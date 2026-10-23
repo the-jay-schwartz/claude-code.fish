@@ -71,14 +71,14 @@ The `CLAUDE_FISH_*` variables are documented in the README. The suffixes match t
 
 ## Releases
 
-[release-please](https://github.com/googleapis/release-please) runs from `.github/workflows/release-please.yml` on every push to `main`. It keeps one open release PR with the computed version, the `version.txt` change and the `CHANGELOG.md` entry. Merging that PR creates the tag and the GitHub release, so `main` is always releasable without being released. Users can pin a release with `fisher install the-jay-schwartz/claude-code.fish@v0.1.0`.
+[release-please](https://github.com/googleapis/release-please) runs from `.github/workflows/release-please.yml` on every push to `main`. It keeps one open release PR with the computed version, the manifest change and the `CHANGELOG.md` entry. Merging that PR creates the tag and the GitHub release, so `main` is always releasable without being released. Users can pin a release with `fisher install the-jay-schwartz/claude-code.fish@v0.1.0`.
 
 - **Version from commits:** `feat:` bumps minor, `fix:` bumps patch, `feat!:` or a `BREAKING CHANGE:` footer bumps major. At 0.x, `bump-minor-pre-major` makes a breaking change bump minor, so the plugin stays below 1.0.0 until we choose to release it with `release-as`. `docs:`, `test:`, `chore:`, `ci:` and `refactor:` are hidden from the changelog and cut no release.
 - **Why 0.x:** 1.0.0 promises the commands, the `CLAUDE_FISH_*` variables and the default keys will not break without a major bump. The `claude` CLI and fish both change outside our control, so we wait for real users before making that promise.
-- **`release-type` is `simple`.** The plugin has no package manifest, so the version lives in `version.txt`.
+- **`release-type` is `simple`.** The plugin has no package manifest, and the version lives in `.release-please-manifest.json` and the git tag. The strategy did not create a `version.txt` in the first release, and nothing reads one.
 - **`bootstrap-sha`** is the commit before the first `feat:`, so the first changelog skips the build history. Release-please ignores it after the first release PR merges, and it can be removed then.
 - **Actions must be allowed to open PRs:** Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests".
-- **Known limitation:** the workflow runs as `GITHUB_TOKEN`, so the release PR does not trigger `ci.yml`. The PR changes only `version.txt`, the changelog and the manifest. Pass a PAT as the action's `token:` input if that ever matters.
+- **Known limitation:** the workflow runs as `GITHUB_TOKEN`, so the release PR does not trigger `ci.yml`. The PR changes only the changelog and the manifest. Pass a PAT as the action's `token:` input if that ever matters.
 
 ## Non-goals
 
