@@ -89,7 +89,7 @@ The `CLAUDE_FISH_*` variables are documented in the README. The suffixes match t
 
 ## Conventions
 
-- **Commits:** [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, `test:`, `chore:`, `ci:`).
+- **Commits:** [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, `test:`, `chore:`, `ci:`). release-please reads them to pick the version and write the changelog. PRs are squash-merged, so the PR title becomes the commit message, and `.github/workflows/pr-title.yml` fails a PR whose title is not a Conventional Commit. There are no local commit hooks, because they would add Node to a fish plugin and protect only contributors who installed them.
 - **Changing a test assertion** needs the maintainer's yes. Adding tests does not.
 - **Fish style:** quote expansions, use `set -l` for function variables, and write one function per file in `functions/`.
 - **Dependencies:** none at runtime. Keep it that way.
