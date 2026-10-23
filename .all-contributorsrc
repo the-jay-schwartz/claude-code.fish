@@ -1,0 +1,19 @@
+{
+  "projectName": "claude-code.fish",
+  "projectOwner": "the-jay-schwartz",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": ["README.md"],
+  "imageSize": 100,
+  "commit": false,
+  "contributorsPerLine": 7,
+  "contributors": [
+    {
+      "login": "the-jay-schwartz",
+      "name": "Jay Schwartz",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26683765?v=4",
+      "profile": "https://github.com/the-jay-schwartz",
+      "contributions": ["code", "doc", "test", "infra", "ideas"]
+    }
+  ]
+}

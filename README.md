@@ -131,6 +131,30 @@ Commits follow [Conventional Commits](https://www.conventionalcommits.org/) (`fe
 - All four features with `claude` logged out → helpful error, not a crash
 - Custom keybinds set before plugin load
 
+## Contributors
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/the-jay-schwartz"><img src="https://avatars.githubusercontent.com/u/26683765?v=4?s=100" width="100px;" alt="Jay Schwartz"/><br /><sub><b>Jay Schwartz</b></sub></a><br /><a href="https://github.com/the-jay-schwartz/claude-code.fish/commits?author=the-jay-schwartz" title="Code">💻</a> <a href="https://github.com/the-jay-schwartz/claude-code.fish/commits?author=the-jay-schwartz" title="Documentation">📖</a> <a href="https://github.com/the-jay-schwartz/claude-code.fish/commits?author=the-jay-schwartz" title="Tests">⚠️</a> <a href="#infra-the-jay-schwartz" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#ideas-the-jay-schwartz" title="Ideas, Planning, & Feedback">🤔</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://allcontributors.org) specification. Contributions of any kind are welcome. After a merged PR, comment on it to add yourself:
+
+```plaintext
+@all-contributors please add @your-username for code, doc
+```
+
 ## Other shells
 
 | Shell | Project |
