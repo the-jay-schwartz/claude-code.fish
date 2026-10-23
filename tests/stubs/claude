@@ -1,0 +1,10 @@
+#!/usr/bin/env fish
+# Fake claude CLI: logs args, records stdin, prints a canned reply.
+for a in $argv
+    echo -- $a >>$CCF_STUB_LOG
+end
+if test -n "$CCF_STUB_STDIN"; and not isatty stdin
+    cat >$CCF_STUB_STDIN
+end
+test -n "$CCF_STUB_REPLY"; and echo $CCF_STUB_REPLY
+exit (test -n "$CCF_STUB_EXIT"; and echo $CCF_STUB_EXIT; or echo 0)
