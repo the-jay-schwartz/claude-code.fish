@@ -23,8 +23,7 @@ Dev only: [fishtape](https://github.com/jorgebucaran/fishtape) for tests. Users 
 ## Related projects
 
 - [matheus-poli/zsh-claude-code](https://github.com/matheus-poli/zsh-claude-code) is the zsh original and the source of the feature set.
-- [michellepol/claude-cmd.fish](https://github.com/michellepol/claude-cmd.fish) and [jglanz/fish-claude-ai-plugin](https://github.com/jglanz/fish-claude-ai-plugin) are existing fish plugins. When we checked, neither had both `ask`/`explain` and the two key bindings, and neither had tests. That gap is why this port exists.
-
+- [michellepol/claude-cmd.fish](https://github.com/michellepol/claude-cmd.fish) and [jglanz/fish-claude-ai-plugin](https://github.com/jglanz/fish-claude-ai-plugin) are existing fish plugins.
 ## Repository layout
 
 ```
@@ -41,7 +40,7 @@ tests/                      fishtape tests; stubs/claude is the fake CLI
 
 ## Public surface
 
-The `CLAUDE_FISH_*` variables are documented in the README. The suffixes match the zsh project's (`ASK_MODEL`, `SUGGEST_KEY` and so on) under our own prefix. Keys are read once at load, so a change needs a new shell. Models and prompts are read on every call.
+The `CLAUDE_FISH_*` variables are documented in the README. Keys are read once at load, so a change needs a new shell. Models and prompts are read on every call.
 
 ## Design notes
 
@@ -57,7 +56,7 @@ The `CLAUDE_FISH_*` variables are documented in the README. The suffixes match t
 - **Dedicated keys, not Enter or a `#` prefix.** Overriding Enter puts every command through our hook. A key is opt-in per press.
 - **Missing `claude`.** The plugin loads without error and binds no keys. `ask` and `explain` still exist and print a message to stderr with status 1.
 - **Quoting is the user's job.** fish parses `*`, `$`, `|`, `;`, `>` and `<` before `ask` or `explain` runs, and an unmatched `*` is a fish error. The README says to quote. The commands join their arguments with single spaces.
-- **Models.** All three features default to `sonnet`, as the zsh project does after its own measurements showed Sonnet faster than Haiku on short tool-less prompts. We have not measured this ourselves.
+- **Models.** All three features default to `sonnet`. Each has its own variable, so a user can pick another model per feature.
 - **Binding names differ across fish versions.** fish 3.7 prints `bind \cg …` and 4.x prints `bind ctrl-g …`, so tests that read `bind` output accept both.
 
 ## Testing
@@ -89,8 +88,7 @@ The `CLAUDE_FISH_*` variables are documented in the README. The suffixes match t
 
 ## Conventions
 
-- **Commits:** [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, `test:`, `chore:`, `ci:`). release-please reads them to pick the version and write the changelog. PRs are squash-merged, so the PR title becomes the commit message, and `.github/workflows/pr-title.yml` fails a PR whose title is not a Conventional Commit. There are no local commit hooks, because they would add Node to a fish plugin and protect only contributors who installed them.
-- **Changing a test assertion** needs the maintainer's yes. Adding tests does not.
+- **Commits:** [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, `test:`, `chore:`, `ci:`). release-please reads them to pick the version and write the changelog. PRs are squash-merged, so the PR title becomes the commit message, and `.github/workflows/pr-title.yml` fails a PR whose title is not a Conventional Commit.- **Changing a test assertion** needs the maintainer's yes. Adding tests does not.
 - **Fish style:** quote expansions, use `set -l` for function variables, and write one function per file in `functions/`.
 - **Dependencies:** none at runtime. Keep it that way.
 - **Contributors:** all-contributors keeps the list in the README. Add someone with `@all-contributors please add @user for code, doc`.
@@ -99,4 +97,3 @@ The `CLAUDE_FISH_*` variables are documented in the README. The suffixes match t
 
 - The widgets block the prompt while the call runs, usually one to three seconds. There is no busy indicator.
 - Keys are read at load, so a new key needs a new shell.
-- There is no cost tracking, so a user who burns through API quota gets no warning from the plugin.
