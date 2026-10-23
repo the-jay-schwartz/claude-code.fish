@@ -33,14 +33,14 @@ functions/   one autoloaded function per file; __ccf_* are internal
   __ccf_suggest.fish        Ctrl+X widget body
   __ccf_explain.fish        Alt+E widget body
   ask.fish, explain.fish    the commands
-conf.d/claude-code.fish     reads the key variables and binds the keys, once, at load
+conf.d/claude-code.fish     reads the key variables and binds the keys, once, at the first prompt
 completions/                tab completion for ask and explain
 tests/                      fishtape tests; stubs/claude is the fake CLI
 ```
 
 ## Public surface
 
-The `CLAUDE_FISH_*` variables are documented in the README. Keys are read once at load, so a change needs a new shell. Models and prompts are read on every call.
+The `CLAUDE_FISH_*` variables are documented in the README. Keys are read once at the first prompt, so a change needs a new shell. Models and prompts are read on every call.
 
 ## Design notes
 
@@ -54,6 +54,7 @@ The `CLAUDE_FISH_*` variables are documented in the README. Keys are read once a
 - **Suggest never runs the command.** It strips one wrapping code fence or one pair of backticks, and trims whitespace. Backticks inside the command stay. A reply of more than one line is rejected, not inserted, because a multi-line buffer could run several commands on one Enter.
 - **A failed call leaves the command line as it was.** An empty line makes no call. An empty reply leaves the buffer alone and prints a message.
 - **Dedicated keys, not Enter or a `#` prefix.** Overriding Enter puts every command through our hook. A key is opt-in per press.
+- **Keys bind at the first prompt, not at load.** fish sources `conf.d` before `config.fish`, so a binding made at load would ignore a key variable set in `config.fish`. `conf.d/claude-code.fish` defines a one-shot `fish_prompt` handler that binds the keys and erases itself. Tests emit `fish_prompt` after sourcing `conf.d`.
 - **Missing `claude`.** The plugin loads without error and binds no keys. `ask` and `explain` still exist and print a message to stderr with status 1.
 - **Quoting is the user's job.** fish parses `*`, `$`, `|`, `;`, `>` and `<` before `ask` or `explain` runs, and an unmatched `*` is a fish error. The README says to quote. The commands join their arguments with single spaces.
 - **Models.** All three features default to `sonnet`. Each has its own variable, so a user can pick another model per feature.
@@ -96,4 +97,4 @@ The `CLAUDE_FISH_*` variables are documented in the README. Keys are read once a
 ## Known issues
 
 - The widgets block the prompt while the call runs, usually one to three seconds. There is no busy indicator.
-- Keys are read at load, so a new key needs a new shell.
+- Keys are read at the first prompt, so a new key needs a new shell.

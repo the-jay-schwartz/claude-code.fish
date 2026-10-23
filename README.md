@@ -74,11 +74,11 @@ Review the command, press <kbd>Enter</kbd> to run (or edit first). The suggestio
 
 Type or paste a command at the prompt, then press <kbd>Alt</kbd>+<kbd>E</kbd>. The explanation prints above the prompt; your command stays intact so you can still edit or run it.
 
-The keys are bound in default and insert modes, and only if `claude` is on `PATH` when the plugin loads.
+The keys are bound in default and insert modes, and only if `claude` is on `PATH` at the first prompt.
 
 ## Configuration
 
-Set any of these in `~/.config/fish/config.fish` before the plugin loads (especially keybinds - they're read once, at load time).
+Set any of these in `~/.config/fish/config.fish`. The keys are read once, at the first prompt, so changing one needs a new shell.
 
 | Variable | Default | Description |
 |---|---|---|
