@@ -131,6 +131,8 @@ Commits follow [Conventional Commits](https://www.conventionalcommits.org/) (`fe
 - All four features with `claude` logged out → helpful error, not a crash
 - Custom keybinds set before plugin load
 
+See [CLAUDE.md](./CLAUDE.md) for design notes and the reasoning behind each decision.
+
 ## Contributors
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
