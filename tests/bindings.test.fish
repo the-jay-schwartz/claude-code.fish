@@ -23,9 +23,9 @@ ccf_teardown
 ccf_setup
 set -g pre "set -g CLAUDE_FISH_SUGGEST_KEY \\cg; set -g CLAUDE_FISH_EXPLAIN_KEY \\ek;"
 set -g custom_out (load_plugin 'bind \cg; bind \ek; bind -M insert \cg; bind -M insert \ek' $pre)
-@test "custom suggest key bound" (string match -rq 'bind ctrl-g __ccf_suggest' -- $custom_out; echo $status) = 0
-@test "custom explain key bound" (string match -rq 'bind alt-k __ccf_explain' -- $custom_out; echo $status) = 0
-@test "custom keys bound in insert mode" (string match -rq 'bind -M insert alt-k __ccf_explain' -- $custom_out; echo $status) = 0
+@test "custom suggest key bound" (string match -rq 'bind (ctrl-g|\\\\cg) __ccf_suggest' -- $custom_out; echo $status) = 0
+@test "custom explain key bound" (string match -rq 'bind (alt-k|\\\\ek) __ccf_explain' -- $custom_out; echo $status) = 0
+@test "custom keys bound in insert mode" (string match -rq 'bind -M insert (alt-k|\\\\ek) __ccf_explain' -- $custom_out; echo $status) = 0
 ccf_teardown
 
 ccf_setup
