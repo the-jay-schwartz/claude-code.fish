@@ -16,7 +16,7 @@ All four features wrap the [`claude` CLI](https://code.claude.com/docs/en/overvi
 | **Suggest widget** | Rewrite the current line (natural language) → one shell command, in place | <kbd>Ctrl</kbd>+<kbd>X</kbd> | `sonnet` |
 | **Explain widget** | Explain the command at the prompt, above it (command stays intact) | <kbd>Alt</kbd>+<kbd>E</kbd> | `sonnet` |
 
-Each call is one-shot: no saved session, no tools, no slash commands.
+Each call is one-shot: no saved session, no tools, no slash commands. Your user-level Claude settings and `CLAUDE.md` still apply, so a preference like "use `fd` instead of `find`" shapes the suggestions. Project-level settings and MCP servers are ignored.
 
 ## Requirements
 
