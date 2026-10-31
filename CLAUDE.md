@@ -57,7 +57,7 @@ The `CLAUDE_FISH_*` variables are documented in the README. Keys are read once a
 - **Keys bind at the first prompt, not at load.** fish sources `conf.d` before `config.fish`, so a binding made at load would ignore a key variable set in `config.fish`. `conf.d/claude-code.fish` defines a one-shot `fish_prompt` handler that binds the keys and erases itself. Tests emit `fish_prompt` after sourcing `conf.d`.
 - **Missing `claude`.** The plugin loads without error and binds no keys. `ask` and `explain` still exist and print a message to stderr with status 1.
 - **Quoting is the user's job.** fish parses `*`, `$`, `|`, `;`, `>` and `<` before `ask` or `explain` runs, and an unmatched `*` is a fish error. The README says to quote. The commands join their arguments with single spaces.
-- **Models.** All three features default to `sonnet`. Each has its own variable, so a user can pick another model per feature.
+- **Models.** Suggest defaults to `haiku`; ask and explain default to `sonnet`. Each has its own variable, so a user can pick another model per feature. Defaults are aliases, not pinned IDs, so a new model release is picked up without a change here. Haiku for suggest is a cost choice: in 2026-10, with alternating calls, it gave the same commands as Sonnet at about a sixteenth of the cost ($0.0008 vs $0.0127 per call), but its API time was 1.3–3.3s against Sonnet's 1.1–1.5s. zsh-claude-code made the same switch and measured Haiku as faster there; our runs did not reproduce that.
 - **Binding names differ across fish versions.** fish 3.7 prints `bind \cg …` and 4.x prints `bind ctrl-g …`, so tests that read `bind` output accept both.
 
 ## Testing

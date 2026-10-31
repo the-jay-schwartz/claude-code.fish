@@ -10,7 +10,10 @@ function __ccf_run --description 'Run a one-shot, tool-less claude call: __ccf_r
 
     set -l model_var CLAUDE_FISH_{$upper}_MODEL
     set -l prompt_var CLAUDE_FISH_{$upper}_SYSTEM_PROMPT
+    # Suggest writes one short command, where haiku matches sonnet at about a
+    # sixteenth of the cost; ask and explain write prose, where sonnet is tighter.
     set -l model sonnet
+    test "$feature" = suggest; and set model haiku
     test -n "$$model_var"; and set model $$model_var
     set -l prompt (__ccf_default_prompt $feature)
     test -n "$$prompt_var"; and set prompt $$prompt_var
