@@ -22,7 +22,7 @@ Dev only: [fishtape](https://github.com/jorgebucaran/fishtape) for tests. Users 
 
 ## Related projects
 
-- [matheus-poli/zsh-claude-code](https://github.com/matheus-poli/zsh-claude-code) is the zsh original and the source of the feature set.
+- [matheus-poli/zsh-claude-code](https://github.com/matheus-poli/zsh-claude-code) is the zsh original and the source of the feature set. Its maintainer asked to keep the two in sync: when a change should land on both sides (prompt tweaks, scrubbing edge cases, keybind conflicts), also open an issue there.
 - [michellepol/claude-cmd.fish](https://github.com/michellepol/claude-cmd.fish) and [jglanz/fish-claude-ai-plugin](https://github.com/jglanz/fish-claude-ai-plugin) are existing fish plugins.
 ## Repository layout
 
