@@ -78,7 +78,7 @@ set -e CLAUDE_FISH_SUGGEST_MODEL
 set -gx CCF_STUB_REPLY ls
 run_suggest 'list'
 set lines (cat $CCF_STUB_LOG)
-@test "default model sonnet" $lines[(math (contains -i -- --model $lines) + 1)] = sonnet
+@test "default model haiku" $lines[(math (contains -i -- --model $lines) + 1)] = haiku
 ccf_teardown
 
 for reply in '' '```

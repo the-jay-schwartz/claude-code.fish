@@ -13,7 +13,7 @@ All four features wrap the [`claude` CLI](https://code.claude.com/docs/en/overvi
 |---|---|---|---|
 | **Ask** | Terse answer to any dev/terminal question | `ask <question>` | `sonnet` |
 | **Explain** | Summarize a command in natural, concise English | `explain <command>` | `sonnet` |
-| **Suggest widget** | Rewrite the current line (natural language) → one shell command, in place | <kbd>Ctrl</kbd>+<kbd>X</kbd> | `sonnet` |
+| **Suggest widget** | Rewrite the current line (natural language) → one shell command, in place | <kbd>Ctrl</kbd>+<kbd>X</kbd> | `haiku` |
 | **Explain widget** | Explain the command at the prompt, above it (command stays intact) | <kbd>Alt</kbd>+<kbd>E</kbd> | `sonnet` |
 
 Each call is one-shot: no saved session, no tools, no slash commands. Your user-level Claude settings and `CLAUDE.md` still apply, so a preference like "use `fd` instead of `find`" shapes the suggestions. Project-level settings and MCP servers are ignored.
@@ -84,7 +84,7 @@ Set any of these in `~/.config/fish/config.fish`. The keys are read once, at the
 |---|---|---|
 | `CLAUDE_FISH_ASK_MODEL` | `sonnet` | Model for `ask` |
 | `CLAUDE_FISH_EXPLAIN_MODEL` | `sonnet` | Model for `explain` + explain widget |
-| `CLAUDE_FISH_SUGGEST_MODEL` | `sonnet` | Model for the suggest widget |
+| `CLAUDE_FISH_SUGGEST_MODEL` | `haiku` | Model for the suggest widget |
 | `CLAUDE_FISH_SUGGEST_KEY` | `\cx` | Keybind for the suggest widget |
 | `CLAUDE_FISH_EXPLAIN_KEY` | `\ee` | Keybind for the explain widget (`\ee` = Alt+E) |
 | `CLAUDE_FISH_ASK_SYSTEM_PROMPT` | *(built-in)* | Full override of the `ask` system prompt |
@@ -94,12 +94,12 @@ Set any of these in `~/.config/fish/config.fish`. The keys are read once, at the
 
 `CLAUDE_FISH_EXTRA_FLAGS` must be a fish list, for example `set -g CLAUDE_FISH_EXTRA_FLAGS --effort low`. A single quoted string such as `'--effort low'` is passed as one argument. Only `--effort`, `--max-budget-usd` and `--fallback-model` (alone or as `flag=value`) are allowed. Any other flag is refused, so tools, permissions, settings and MCP cannot be changed.
 
-### Example: change keybind and use a stronger `ask` model
+### Example: change keybind and use a faster suggest model
 
 ```fish
 # ~/.config/fish/config.fish
-set -g CLAUDE_FISH_SUGGEST_KEY \cg     # Ctrl+G instead of Ctrl+X
-set -g CLAUDE_FISH_ASK_MODEL opus      # stronger model for ask, slower
+set -g CLAUDE_FISH_SUGGEST_KEY \cg       # Ctrl+G instead of Ctrl+X
+set -g CLAUDE_FISH_SUGGEST_MODEL sonnet  # faster, more expensive
 ```
 
 ## Privacy
