@@ -94,12 +94,12 @@ Set any of these in `~/.config/fish/config.fish`. The keys are read once, at the
 
 `CLAUDE_FISH_EXTRA_FLAGS` must be a fish list, for example `set -g CLAUDE_FISH_EXTRA_FLAGS --effort low`. A single quoted string such as `'--effort low'` is passed as one argument. Only `--effort`, `--max-budget-usd` and `--fallback-model` (alone or as `flag=value`) are allowed. Any other flag is refused, so tools, permissions, settings and MCP cannot be changed.
 
-### Example: change keybind and use a stronger `ask` model
+### Example: change keybind and use a faster suggest model
 
 ```fish
 # ~/.config/fish/config.fish
-set -g CLAUDE_FISH_SUGGEST_KEY \cg     # Ctrl+G instead of Ctrl+X
-set -g CLAUDE_FISH_ASK_MODEL opus      # stronger model for ask, slower
+set -g CLAUDE_FISH_SUGGEST_KEY \cg       # Ctrl+G instead of Ctrl+X
+set -g CLAUDE_FISH_SUGGEST_MODEL sonnet  # faster, more expensive
 ```
 
 ## Privacy
