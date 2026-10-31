@@ -142,6 +142,7 @@ See [CLAUDE.md](./CLAUDE.md) for design notes and the reasoning behind each deci
   <tbody>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/the-jay-schwartz"><img src="https://avatars.githubusercontent.com/u/26683765?v=4?s=100" width="100px;" alt="Jay Schwartz"/><br /><sub><b>Jay Schwartz</b></sub></a><br /><a href="https://github.com/the-jay-schwartz/claude-code.fish/commits?author=the-jay-schwartz" title="Code">💻</a> <a href="https://github.com/the-jay-schwartz/claude-code.fish/commits?author=the-jay-schwartz" title="Documentation">📖</a> <a href="https://github.com/the-jay-schwartz/claude-code.fish/commits?author=the-jay-schwartz" title="Tests">⚠️</a> <a href="#infra-the-jay-schwartz" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#ideas-the-jay-schwartz" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/matheus-poli"><img src="https://avatars.githubusercontent.com/u/25781749?v=4?s=100" width="100px;" alt="Matheus Poli"/><br /><sub><b>Matheus Poli</b></sub></a><br /><a href="#ideas-matheus-poli" title="Ideas, Planning, & Feedback">🤔</a></td>
     </tr>
   </tbody>
 </table>
