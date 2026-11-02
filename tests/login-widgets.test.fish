@@ -19,6 +19,7 @@ for w in suggest explain
     @test "$w: login then retry logs in once" (ccf_logins) -eq 1
     @test "$w: logged-out message shown first" (string match -q '*not logged in*' <$CCF_TMP/err; echo $status) -eq 0
     @test "$w: login then retry repaints once" "$CCF_FUNCS" = repaint
+    @test "$w: logged-out message not repeated after the retry" (count (string match '*not logged in*' <$CCF_TMP/err)) -eq 1
     if test $w = suggest
         @test "suggest: login then retry inserts command" "$CCF_REPLACED" = 'echo hi'
     else

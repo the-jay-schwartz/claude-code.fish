@@ -2,7 +2,7 @@ function __ccf_offer_login --description 'Offer to run `claude auth login`; succ
     set -l feature $argv[1]
     printf 'Log in now? [y/N] ' >&2
     # -P '': on a terminal read draws its own "read> " prompt over ours.
-    read -n 1 -P '' key; or begin
+    read -l -n 1 -P '' key; or begin
         echo >&2
         return 1
     end
@@ -17,7 +17,8 @@ function __ccf_offer_login --description 'Offer to run `claude auth login`; succ
         or set modes
     end
     test -n "$modes"; and stty sane
-    claude auth login
+    # To stderr, so the login's URL stays on the terminal when the caller's stdout is redirected.
+    claude auth login >&2
     test -n "$modes"; and stty $modes
 
     # The login exits 0 even on Ctrl+C, so judge success by the auth state.

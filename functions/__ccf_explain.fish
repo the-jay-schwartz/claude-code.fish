@@ -9,6 +9,7 @@ function __ccf_explain --description 'Print an explanation of the command line a
     set -l code
     set -l text
     for attempt in 1 2
+        set err
         set reply (begin; __ccf_run explain $buffer; set -g __ccf_status $status; end 2>| read -z err)
         set code $__ccf_status
         set -e __ccf_status

@@ -9,6 +9,7 @@ function __ccf_suggest --description 'Replace the command line (a plain-English 
     set -l code
     set -l text
     for attempt in 1 2
+        set err
         set reply (begin; __ccf_run suggest $buffer; set -g __ccf_status $status; end 2>| read -z err)
         set code $__ccf_status
         set -e __ccf_status
