@@ -7,14 +7,6 @@ function isatty
     return 0
 end
 
-function ccf_calls --description 'number of claude calls that carried --print'
-    count (string match -- --print <$CCF_STUB_LOG)
-end
-
-function ccf_logins
-    count (string match login <$CCF_TMP/auth.log)
-end
-
 for cmd in ask explain
     # logged out, terminal, y, login works: retry succeeds
     ccf_setup

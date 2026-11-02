@@ -32,16 +32,12 @@ function __ccf_run --description 'Run a one-shot, tool-less claude call: __ccf_r
         --setting-sources user --strict-mcp-config \
         $CLAUDE_FISH_EXTRA_FLAGS -- $question)
     set -l code $status
-    if test $code -eq 0
-        test (count $out) -gt 0; and string join \n -- $out
-        return 0
-    end
     # Logged out: claude's own /login hint is on stdout, so show ours instead.
-    if __ccf_logged_out
+    if test $code -ne 0; and __ccf_logged_out
         echo "$feature: claude is not logged in; run 'claude auth login'" >&2
         return 3
     end
     test (count $out) -gt 0; and string join \n -- $out
-    echo "$feature: claude failed with status $code" >&2
+    test $code -ne 0; and echo "$feature: claude failed with status $code" >&2
     return $code
 end

@@ -2,14 +2,6 @@ set -g here (status dirname)
 source $here/helpers.fish
 ccf_load_functions
 
-function ccf_logins
-    count (string match login <$CCF_TMP/auth.log)
-end
-
-function ccf_calls --description 'number of claude calls that carried --print'
-    count (string match -- --print <$CCF_STUB_LOG)
-end
-
 # $argv[1] widget, $argv[2] answer; stderr (the messages) lands in $CCF_TMP/err
 function run_widget
     ccf_reset_commandline 'say hi'
@@ -68,4 +60,4 @@ for w in suggest explain
     ccf_teardown
 end
 
-functions -e ccf_logins ccf_calls run_widget
+functions -e run_widget
