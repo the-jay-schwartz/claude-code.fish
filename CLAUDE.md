@@ -16,7 +16,7 @@ fish users, usually installing with Fisher, who already use Claude Code and want
 ## Requirements
 
 - fish 3.4 or newer. CI runs fish 3.7 (Ubuntu) and the current Homebrew fish (macOS).
-- The `claude` CLI, installed and logged in with `claude login` or `ANTHROPIC_API_KEY`.
+- The `claude` CLI, installed and logged in with `claude auth login` or `ANTHROPIC_API_KEY`.
 
 Dev only: [fishtape](https://github.com/jorgebucaran/fishtape) for tests. Users do not need it.
 
@@ -31,6 +31,8 @@ functions/   one autoloaded function per file; __ccf_* are internal
   __ccf_run.fish            the one-shot claude call, shared by every feature
   __ccf_default_prompt.fish built-in system prompt per feature
   __ccf_print_above.fish    widget output on fresh rows, padded for the repaint
+  __ccf_logged_out.fish     true when `claude auth status` reports `"loggedIn": false`
+  __ccf_offer_login.fish    asks `Log in now? [y/N]`, runs `claude auth login`, re-checks
   __ccf_suggest.fish        Ctrl+X widget body
   __ccf_explain.fish        Alt+E widget body
   ask.fish, explain.fish    the commands
@@ -49,11 +51,17 @@ The `CLAUDE_FISH_*` variables are documented in the README. Keys are read once a
 - **`--tools ""`, `--no-session-persistence`, `--disable-slash-commands`.** The helpers are text in and text out. Tools would let Claude read files or run commands the user did not expect, and a saved session would clutter `claude --resume`.
 - **`--setting-sources user --strict-mcp-config`.** Project settings and MCP servers in the current directory would change what a one-shot call can do. User-level settings and `CLAUDE.md` still apply on purpose, so a user who prefers `fd` to `find` gets `fd` suggestions.
 - **`--` before the question.** `--tools` takes a variadic list and would swallow the question without it. The stub CLI cannot show this; we found it by running the real CLI.
-- **Not `--bare`.** It disables OAuth and the keychain, which breaks users logged in with `claude login`.
+- **Not `--bare`.** It disables OAuth and the keychain, which breaks users logged in with `claude auth login`.
 - **`CLAUDE_FISH_EXTRA_FLAGS` is an allowlist.** Only `--effort`, `--max-budget-usd` and `--fallback-model` pass, alone or as `flag=value`, and any other dash token is refused with status 2. A denylist missed flag orderings that re-enabled tools. The value must be a fish list; a quoted `'--effort low'` is one argument.
 - **Suggest replaces the buffer; explain does not.** Suggest is an authoring flow: the user reviews the command and presses Enter. Explain is read-only: it prints above the prompt and leaves the line as typed.
 - **Suggest never runs the command.** It strips one wrapping code fence or one pair of backticks, and trims whitespace. Backticks inside the command stay. A reply of more than one line is rejected, not inserted, because a multi-line buffer could run several commands on one Enter.
-- **A failed call leaves the command line as it was.** An empty line makes no call. An empty reply leaves the buffer alone and prints a message.
+- **A failed call leaves the command line as it was.** An empty line makes no call. An empty reply leaves the buffer alone and prints a message. The logged-out path is the same: `__ccf_run` returns 3 and prints `<feature>: claude is not logged in; run 'claude auth login'`. On `n` or a failed login the line is left as it was.
+- **Assisted login.** `ask` and `explain` offer the login only when stdin and stderr are terminals; the widgets always offer. Each retries once, never in a loop.
+- **Logged out is read from the JSON.** `claude auth status` exits 1 and prints `loggedIn` JSON when logged out; the JSON is the signal, not the exit code.
+- **Login success is re-checked.** Ctrl+C in `claude auth login` exits 0, so `auth status` is run again afterwards.
+- **`stty sane` around the login.** The login child only reads pasted input after `stty sane` (`</dev/tty` alone did not help). The saved modes are restored afterwards. `stty` is skipped when it is missing or stdin is not a terminal.
+- **`read -P ''`.** A terminal `read` draws its own `read> ` prompt unless given `-P ''`.
+- **Not testable offline.** The real keypress, `stty` and Ctrl+C behaviour were checked by hand in a pty on fish 4.9.3.
 - **Dedicated keys, not Enter or a `#` prefix.** Overriding Enter puts every command through our hook. A key is opt-in per press.
 - **Keys bind at the first prompt, not at load.** fish sources `conf.d` before `config.fish`, so a binding made at load would ignore a key variable set in `config.fish`. `conf.d/claude-code.fish` defines a one-shot `fish_prompt` handler that binds the keys and erases itself. Tests emit `fish_prompt` after sourcing `conf.d`.
 - **Widgets print through `__ccf_print_above`.** The cursor sits on the command line, and `commandline -f repaint` redraws the prompt starting one row up for each prompt line beyond the first. Output printed straight after the line, or ending flush against the repaint, was overwritten: with a three-line prompt Alt+E lost the last two lines of its reply and a failing Ctrl+X lost its error. The helper starts on a fresh row and adds one newline per extra prompt line, as fish's own `__fish_echo` does. The widgets run `__ccf_run` with its stderr piped into a variable (`2>| read -z`) so the message goes through the helper too; `$status` comes back through a global, because the pipeline's status is `read`'s. The one-line-prompt case was fine before, which is how it went unnoticed. zsh-claude-code shipped the same bug in v0.2.0.
