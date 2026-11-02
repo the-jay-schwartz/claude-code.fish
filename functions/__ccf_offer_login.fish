@@ -1,7 +1,8 @@
 function __ccf_offer_login --description 'Offer to run `claude auth login`; succeed iff the user ends up logged in'
     set -l feature $argv[1]
     printf 'Log in now? [y/N] ' >&2
-    read -n 1 key; or begin
+    # -P '': on a terminal read draws its own "read> " prompt over ours.
+    read -n 1 -P '' key; or begin
         echo >&2
         return 1
     end
