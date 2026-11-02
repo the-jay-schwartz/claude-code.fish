@@ -30,6 +30,7 @@ Dev only: [fishtape](https://github.com/jorgebucaran/fishtape) for tests. Users 
 functions/   one autoloaded function per file; __ccf_* are internal
   __ccf_run.fish            the one-shot claude call, shared by every feature
   __ccf_default_prompt.fish built-in system prompt per feature
+  __ccf_print_above.fish    widget output on fresh rows, padded for the repaint
   __ccf_suggest.fish        Ctrl+X widget body
   __ccf_explain.fish        Alt+E widget body
   ask.fish, explain.fish    the commands
@@ -55,6 +56,7 @@ The `CLAUDE_FISH_*` variables are documented in the README. Keys are read once a
 - **A failed call leaves the command line as it was.** An empty line makes no call. An empty reply leaves the buffer alone and prints a message.
 - **Dedicated keys, not Enter or a `#` prefix.** Overriding Enter puts every command through our hook. A key is opt-in per press.
 - **Keys bind at the first prompt, not at load.** fish sources `conf.d` before `config.fish`, so a binding made at load would ignore a key variable set in `config.fish`. `conf.d/claude-code.fish` defines a one-shot `fish_prompt` handler that binds the keys and erases itself. Tests emit `fish_prompt` after sourcing `conf.d`.
+- **Widgets print through `__ccf_print_above`.** The cursor sits on the command line, and `commandline -f repaint` redraws the prompt starting one row up for each prompt line beyond the first. Output printed straight after the line, or ending flush against the repaint, was overwritten: with a three-line prompt Alt+E lost the last two lines of its reply and a failing Ctrl+X lost its error. The helper starts on a fresh row and adds one newline per extra prompt line, as fish's own `__fish_echo` does. The widgets run `__ccf_run` with its stderr piped into a variable (`2>| read -z`) so the message goes through the helper too; `$status` comes back through a global, because the pipeline's status is `read`'s. The one-line-prompt case was fine before, which is how it went unnoticed. zsh-claude-code shipped the same bug in v0.2.0.
 - **Missing `claude`.** The plugin loads without error and binds no keys. `ask` and `explain` still exist and print a message to stderr with status 1.
 - **Quoting is the user's job.** fish parses `*`, `$`, `|`, `;`, `>` and `<` before `ask` or `explain` runs, and an unmatched `*` is a fish error. The README says to quote. The commands join their arguments with single spaces.
 - **Models.** Suggest defaults to `haiku`; ask and explain default to `sonnet`. Each has its own variable, so a user can pick another model per feature. Defaults are aliases, not pinned IDs, so a new model release is picked up without a change here. Haiku for suggest is a cost choice: in 2026-10, with alternating calls, it gave the same commands as Sonnet at about a sixteenth of the cost ($0.0008 vs $0.0127 per call), but its API time was 1.3–3.3s against Sonnet's 1.1–1.5s. zsh-claude-code made the same switch and measured Haiku as faster there; our runs did not reproduce that.
@@ -67,7 +69,7 @@ The `CLAUDE_FISH_*` variables are documented in the README. Keys are read once a
 - **Live smoke test:** `CCF_LIVE=1 fishtape tests/live.test.fish` makes a few small API calls to the real `claude`. Without the variable it shows one placeholder test. Run it before a release.
 - **CI** (`.github/workflows/ci.yml`) runs the suite on Ubuntu and macOS for every push to `main` and every PR. The two runners give two fish versions (3.7 and 4.x), which is the point. Actions are pinned by SHA.
 - **Manual checklist:** the README's Contributing section lists the cases the stub cannot cover.
-- **No test for the failure message on stderr** in the explain widget. fish sends a command substitution's stderr straight to the terminal, so a test cannot capture it. The code does not touch that stream, so check it by hand.
+- **Screen layout is not testable offline.** The tests count the rows the widgets print, but only a real terminal shows whether the repaint overwrites them. Check a multi-line prompt by hand, or drive fish in a pty through a terminal emulator such as `pyte` (answer fish's terminal queries, or it waits). The widgets' failure messages are tested: they pass through `__ccf_print_above`, so stderr is capturable.
 
 ## Releases
 

@@ -129,6 +129,7 @@ Commits follow [Conventional Commits](https://www.conventionalcommits.org/) (`fe
 - <kbd>Ctrl</kbd>+<kbd>X</kbd> with a clear request and an ambiguous one
 - <kbd>Alt</kbd>+<kbd>E</kbd> on a typed command - original command must stay intact
 - All four features with `claude` logged out → helpful error, not a crash
+- <kbd>Alt</kbd>+<kbd>E</kbd> and a failing <kbd>Ctrl</kbd>+<kbd>X</kbd> with a two- or three-line prompt - the whole reply and the error message must stay visible above the redrawn prompt
 - Custom keybinds set before plugin load
 
 See [CLAUDE.md](./CLAUDE.md) for design notes and the reasoning behind each decision.
