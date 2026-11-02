@@ -43,7 +43,7 @@ set -gx CCF_STUB_REPLY 'cd /tmp
 ls'
 ccf_reset_commandline 'go and list'
 set err (__ccf_suggest </dev/null 2>&1 >/dev/null | string collect)
-@test "multi-line reply is rejected" $CCF_REPLACE_COUNT -eq 0 -a -z "$CCF_REPLACED" -a "$CCF_BUFFER" = 'go and list' -a "$err" = 'suggest: claude returned more than one line; not inserting' -a "$CCF_FUNCS" = repaint
+@test "multi-line reply is rejected" $CCF_REPLACE_COUNT -eq 0 -a -z "$CCF_REPLACED" -a "$CCF_BUFFER" = 'go and list' -a "$err" = \nsuggest:\ claude\ returned\ more\ than\ one\ line\;\ not\ inserting -a "$CCF_FUNCS" = repaint
 ccf_teardown
 
 ccf_setup
@@ -89,7 +89,7 @@ for reply in '' '```
     ccf_reset_commandline 'list files'
     set err (__ccf_suggest </dev/null 2>&1 >/dev/null | string collect)
     @test "empty reply: buffer untouched" $CCF_REPLACE_COUNT -eq 0
-    @test "empty reply: message on stderr" "$err" = 'suggest: claude returned no command'
+    @test "empty reply: message on stderr" "$err" = \nsuggest:\ claude\ returned\ no\ command
     @test "empty reply: still repaints" "$CCF_FUNCS" = repaint
     ccf_teardown
 end
