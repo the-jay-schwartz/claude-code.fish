@@ -8,8 +8,15 @@ function ccf_setup --description 'Put the stub claude first on PATH with a fresh
     set -gx CCF_STUB_STDIN $CCF_TMP/stdin
     set -gx CCF_STUB_REPLY ''
     set -gx CCF_STUB_EXIT 0
+    touch $CCF_TMP/auth.log
+    set -gx CCF_STUB_AUTH_LOG $CCF_TMP/auth.log
     set -l stubs (path resolve (status dirname)/stubs)
     set -gx PATH $stubs $PATH
+end
+
+function ccf_logged_out --description 'Make the stub claude behave as logged out'
+    touch $CCF_TMP/loggedout
+    set -gx CCF_STUB_LOGGED_OUT $CCF_TMP/loggedout
 end
 
 function ccf_no_claude --description 'Make claude unfindable'
@@ -19,7 +26,7 @@ end
 function ccf_teardown --description 'Undo ccf_setup'
     set -gx PATH $CCF_SAVED_PATH
     rm -rf $CCF_TMP
-    set -e CCF_SAVED_PATH CCF_TMP CCF_STUB_LOG CCF_STUB_STDIN CCF_STUB_REPLY CCF_STUB_EXIT
+    set -e CCF_SAVED_PATH CCF_TMP CCF_STUB_LOG CCF_STUB_STDIN CCF_STUB_REPLY CCF_STUB_EXIT CCF_STUB_AUTH_LOG CCF_STUB_LOGGED_OUT CCF_STUB_LOGIN_OK
 end
 
 function ccf_load_functions --description 'Put the worktree functions/ dir first on fish_function_path'
