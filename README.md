@@ -2,7 +2,7 @@
 
 Claude-powered helpers for your fish prompt. Ask questions, explain commands, and turn natural language into shell commands - without leaving the terminal.
 
-All four features wrap the [`claude` CLI](https://code.claude.com/docs/en/overview) (Claude Code) in `--print` mode, so if you're already logged in with `claude login` there's nothing else to set up.
+All four features wrap the [`claude` CLI](https://code.claude.com/docs/en/overview) (Claude Code) in `--print` mode, so if you're already logged in with `claude auth login` there's nothing else to set up.
 
 - **<kbd>Ctrl</kbd>+<kbd>X</kbd>** - describe a command in plain English, press to rewrite the line into shell.
 - **<kbd>Alt</kbd>+<kbd>E</kbd>** - type or paste a command, press to print an explanation above it.
@@ -21,7 +21,7 @@ Each call is one-shot: no saved session, no tools, no slash commands. Your user-
 ## Requirements
 
 - [fish](https://fishshell.com) 3.4+
-- [`claude` CLI](https://code.claude.com/docs/en/overview) installed and authenticated (either `claude login` or `ANTHROPIC_API_KEY` in the environment)
+- [`claude` CLI](https://code.claude.com/docs/en/overview) installed and authenticated (either `claude auth login` or `ANTHROPIC_API_KEY` in the environment)
 - [Fisher](https://github.com/jorgebucaran/fisher) to install
 - No other runtime dependencies
 
@@ -108,9 +108,17 @@ set -g CLAUDE_FISH_SUGGEST_MODEL sonnet  # faster, more expensive
 
 ## Troubleshooting
 
-- **"the 'claude' command was not found"** - the plugin loads but binds no keys when `claude` isn't on `PATH`. Install Claude Code and run `claude login`.
+- **"the 'claude' command was not found"** - the plugin loads but binds no keys when `claude` isn't on `PATH`. Install Claude Code and run `claude auth login`.
 - **Widget doesn't fire** - another plugin may have rebound the key. Try setting `CLAUDE_FISH_SUGGEST_KEY` to something else, or use `bind | grep __ccf` to confirm the binding.
 - **Output has stray backticks / code fences** - the suggest widget strips one surrounding fence or pair of backticks. If more appear, tighten `CLAUDE_FISH_SUGGEST_SYSTEM_PROMPT`, or open an issue with the input that produced it.
+
+## When you are logged out
+
+If `claude` is logged out, the features say so instead of failing: `ask: claude is not logged in; run 'claude auth login'`.
+
+- `ask` and `explain` offer `Log in now? [y/N]` when run in a terminal. Press `y` to run `claude auth login`, and the command is retried once.
+- <kbd>Ctrl</kbd>+<kbd>X</kbd> and <kbd>Alt</kbd>+<kbd>E</kbd> always make the same offer and retry once.
+- Press anything else, or cancel the login, and your command line stays as it was.
 
 ## Contributing
 
@@ -129,6 +137,7 @@ Commits follow [Conventional Commits](https://www.conventionalcommits.org/) (`fe
 - <kbd>Ctrl</kbd>+<kbd>X</kbd> with a clear request and an ambiguous one
 - <kbd>Alt</kbd>+<kbd>E</kbd> on a typed command - original command must stay intact
 - All four features with `claude` logged out → helpful error, not a crash
+- All four features logged out, then `y` (the retry works), `n` (the line is kept), and <kbd>Ctrl</kbd>+<kbd>C</kbd> in the login (the line is kept)
 - <kbd>Alt</kbd>+<kbd>E</kbd> and a failing <kbd>Ctrl</kbd>+<kbd>X</kbd> with a two- or three-line prompt - the whole reply and the error message must stay visible above the redrawn prompt
 - Custom keybinds set before plugin load
 
