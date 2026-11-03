@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.2.0](https://github.com/the-jay-schwartz/claude-code.fish/compare/v0.1.1...v0.2.0) (2026-11-02)
+
+
+### Features
+
+* default the suggest widget to haiku ([#11](https://github.com/the-jay-schwartz/claude-code.fish/issues/11)) ([99b27cf](https://github.com/the-jay-schwartz/claude-code.fish/commit/99b27cf01f5138bcf80d442a2aac28e93c43b2d2))
+* offer to log in when claude is logged out ([#14](https://github.com/the-jay-schwartz/claude-code.fish/issues/14)) ([c05ddd4](https://github.com/the-jay-schwartz/claude-code.fish/commit/c05ddd4960286551ce4dcf69f26900012091c305))
+
+
+### Bug Fixes
+
+* keep widget output visible with a multi-line prompt ([#13](https://github.com/the-jay-schwartz/claude-code.fish/issues/13)) ([2ed26e7](https://github.com/the-jay-schwartz/claude-code.fish/commit/2ed26e78fe5242f770d9eeb77fd9e7ac1e6b3af1))
+
 ## [0.1.1](https://github.com/the-jay-schwartz/claude-code.fish/compare/v0.1.0...v0.1.1) (2026-10-23)
 
 
